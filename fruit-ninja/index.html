@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#3a2414">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Fruit Ninja</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; height: 100%; overflow: hidden; background: #3a2414; color: #fff;
+    font-family: "Trebuchet MS", "Avenir Next", system-ui, sans-serif;
+    user-select: none; -webkit-user-select: none; touch-action: none; overscroll-behavior: none;
+  }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .ui { position: fixed; pointer-events: none; text-shadow: 0 3px 0 rgba(0,0,0,.45); }
+  #hud { inset: 0; display: none; }
+  #score {
+    position: absolute; left: 16px; top: calc(env(safe-area-inset-top) + 10px);
+    font-size: 46px; font-weight: 900; color: #ffd23f; line-height: 1;
+  }
+  #scoreBest { position: absolute; left: 18px; top: calc(env(safe-area-inset-top) + 60px); font-size: 15px; opacity: .85; }
+  #right { position: absolute; right: 16px; top: calc(env(safe-area-inset-top) + 12px); font-size: 34px; font-weight: 900; }
+  #lives span { color: rgba(255,255,255,.35); margin-left: 4px; display: inline-block; transition: transform .2s, color .2s; }
+  #lives span.lost { color: #ff3b30; transform: scale(1.25); }
+  #pauseBtn {
+    position: fixed; left: 50%; transform: translateX(-50%); top: calc(env(safe-area-inset-top) + 12px);
+    width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,.5);
+    background: rgba(0,0,0,.25); color: #fff; font-size: 14px; display: none; pointer-events: auto;
+  }
+  #title {
+    top: calc(env(safe-area-inset-top) + 7vh); left: 0; right: 0; text-align: center;
+    transition: opacity .25s;
+  }
+  #title h1 {
+    margin: 0; font-size: clamp(46px, 12vmin, 96px); line-height: .9; letter-spacing: 1px;
+    color: #ffd23f; -webkit-text-stroke: 2px #6b2d0c; text-shadow: 0 6px 0 #6b2d0c, 0 10px 18px rgba(0,0,0,.5);
+    transform: rotate(-3deg);
+  }
+  #title h1 small { display: block; font-size: .55em; color: #ff5a3c; }
+  #title p { margin: 14px 0 0; font-size: 17px; opacity: .9; }
+  #soundBtn {
+    position: fixed; bottom: calc(env(safe-area-inset-bottom) + 16px); right: 16px; pointer-events: auto;
+    border: 2px solid rgba(255,255,255,.5); background: rgba(0,0,0,.3); color: #fff;
+    border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 14px;
+  }
+  .overlay {
+    position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 12px; text-align: center; background: rgba(20, 10, 4, .62);
+    transition: opacity .25s; padding: 24px; text-shadow: 0 3px 0 rgba(0,0,0,.45);
+  }
+  .hidden { opacity: 0 !important; pointer-events: none !important; }
+  .overlay h2 { margin: 0; font-size: 40px; color: #ff5a3c; -webkit-text-stroke: 1px #5a1a05; }
+  .big { font-size: 90px; font-weight: 900; color: #ffd23f; line-height: 1; }
+  .sub { font-size: 17px; opacity: .9; }
+  .newbest { font-size: 20px; font-weight: 900; color: #7dff6a; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+  button.btn {
+    border: 0; border-radius: 14px; padding: 14px 28px; font: inherit; font-size: 21px; font-weight: 900;
+    color: #3a1a05; background: linear-gradient(#ffe066, #f5a623); box-shadow: 0 5px 0 #8a4a0a; cursor: pointer;
+  }
+  button.btn.alt { background: linear-gradient(#f3e6d0, #c9b18c); box-shadow: 0 5px 0 #6b5638; }
+  button.btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #8a4a0a; }
+  .homeLink {
+    position: absolute; top: calc(env(safe-area-inset-top) + 10px); left: 10px; z-index: 20;
+    padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.38); color: #fff !important;
+    font: 700 13px system-ui, -apple-system, "Segoe UI", sans-serif; text-decoration: none; letter-spacing: .2px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .homeLink:active { transform: scale(.96); }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud" class="ui">
+  <div id="score">0</div>
+  <div id="scoreBest"></div>
+  <div id="right"><span id="lives"><span>✕</span><span>✕</span><span>✕</span></span><span id="timer"></span></div>
+</div>
+<button id="pauseBtn" aria-label="Pause">❚❚</button>
+
+<div id="title" class="ui">
+  <h1>FRUIT<small>NINJA</small></h1>
+  <p id="hint">Slice a fruit to start!</p>
+</div>
+<a class="homeLink" id="homeLink" style="position:fixed" href="../">← All games</a>
+<button id="soundBtn">🔊 sound on</button>
+
+<div id="paused" class="overlay hidden">
+  <h2>Paused</h2>
+  <div class="row"><button class="btn" id="resumeBtn">Resume</button><button class="btn alt" id="quitBtn">Quit</button></div>
+</div>
+
+<div id="over" class="overlay hidden">
+  <a class="homeLink" href="../">← All games</a>
+  <h2 id="overTitle">Game Over</h2>
+  <div class="sub" id="reason"></div>
+  <div class="big" id="finalScore">0</div>
+  <div class="newbest" id="newBest" style="display:none">★ NEW BEST ★</div>
+  <div class="sub" id="bestOver"></div>
+  <div class="row"><button class="btn" id="againBtn">Play again</button><button class="btn alt" id="menuBtn">Menu</button></div>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const canvas = $("c"), ctx = canvas.getContext("2d");
+  let W, H, U, DPR, wood;
+
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const pick = a => a[(Math.random() * a.length) | 0];
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  // ---------- wooden background, rendered once per resize ----------
+  function paintWood() {
+    wood = document.createElement("canvas");
+    wood.width = W * DPR; wood.height = H * DPR;
+    const g = wood.getContext("2d");
+    g.scale(DPR, DPR);
+    const plank = Math.max(70, W / 6);
+    for (let x = 0, i = 0; x < W; x += plank, i++) {
+      const shade = [0, 10, -6, 6, -10, 3][i % 6];
+      const grad = g.createLinearGradient(x, 0, x + plank, 0);
+      grad.addColorStop(0, `hsl(26, 45%, ${24 + shade / 3}%)`);
+      grad.addColorStop(0.5, `hsl(27, 48%, ${31 + shade / 3}%)`);
+      grad.addColorStop(1, `hsl(25, 45%, ${23 + shade / 3}%)`);
+      g.fillStyle = grad; g.fillRect(x, 0, plank, H);
+      // grain
+      g.strokeStyle = "rgba(30, 14, 4, .18)"; g.lineWidth = 1.2;
+      for (let k = 0; k < 9; k++) {
+        const gx = x + rand(6, plank - 6), wob = rand(2, 7), ph = rand(0, 6);
+        g.beginPath();
+        for (let y = 0; y <= H; y += 12) g.lineTo(gx + Math.sin(y / 60 + ph) * wob, y);
+        g.stroke();
+      }
+      // knot
+      if (Math.random() < 0.7) {
+        const kx = x + rand(15, plank - 15), ky = rand(40, H - 40);
+        g.strokeStyle = "rgba(30, 14, 4, .3)";
+        for (let r = 3; r < 14; r += 3) { g.beginPath(); g.ellipse(kx, ky, r * 0.7, r * 1.6, 0, 0, Math.PI * 2); g.stroke(); }
+      }
+      g.fillStyle = "rgba(10, 4, 0, .55)"; g.fillRect(x, 0, 3, H);
+    }
+    const vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.3, W / 2, H / 2, Math.max(W, H) * 0.75);
+    vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,.55)");
+    g.fillStyle = vg; g.fillRect(0, 0, W, H);
+  }
+
+  function resize() {
+    W = window.innerWidth; H = window.innerHeight;
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5);
+    canvas.width = W * DPR; canvas.height = H * DPR;
+    U = Math.min(W, H) / 100;
+    U = Math.max(U, 3.6);
+    paintWood();
+    if (state === "menu") placeMenuFruits();
+  }
+
+  // ---------- fruit catalogue ----------
+  const FRUITS = {
+    watermelon: { r: 11, skin: "#2e8b2e", dark: "#185c18", rind: "#e8f5c8", flesh: "#f2405b", juice: "#e8274b", pts: 1 },
+    orange:     { r: 8.2, skin: "#f6921e", dark: "#c2650a", rind: "#fff1d0", flesh: "#ffae3d", juice: "#ff9a1f", pts: 1 },
+    apple:      { r: 8,   skin: "#d62d2d", dark: "#8f1414", rind: "#fff6dc", flesh: "#fbf1c7", juice: "#f4e49a", pts: 1 },
+    lemon:      { r: 7.6, skin: "#f7df3c", dark: "#c9ad12", rind: "#fffbd8", flesh: "#fbef7a", juice: "#f0e03a", pts: 1 },
+    kiwi:       { r: 7.2, skin: "#8a6a3b", dark: "#5c4421", rind: "#eef7c0", flesh: "#86c23a", juice: "#9bd14a", pts: 1 },
+    plum:       { r: 7.2, skin: "#6b2a7a", dark: "#3e1048", rind: "#fde3a8", flesh: "#f2b33d", juice: "#b03a8a", pts: 1 },
+    coconut:    { r: 8.8, skin: "#6b4423", dark: "#3f2610", rind: "#f6f1e6", flesh: "#ffffff", juice: "#f4f4f4", pts: 1 },
+  };
+  const KINDS = Object.keys(FRUITS);
+
+  function circle(x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); }
+
+  function drawWhole(kind, r, t) {
+    const f = FRUITS[kind];
+    ctx.save();
+    if (kind === "lemon") ctx.scale(1.18, 0.88);
+    const grad = ctx.createRadialGradient(-r * 0.35, -r * 0.4, r * 0.1, 0, 0, r);
+    grad.addColorStop(0, lighten(f.skin, 40)); grad.addColorStop(0.55, f.skin); grad.addColorStop(1, f.dark);
+    ctx.fillStyle = grad; circle(0, 0, r); ctx.fill();
+    if (kind === "watermelon") {
+      ctx.strokeStyle = f.dark; ctx.lineWidth = r * 0.14; ctx.lineCap = "round";
+      ctx.save(); circle(0, 0, r); ctx.clip();
+      for (let i = -2; i <= 2; i++) {
+        ctx.beginPath();
+        for (let y = -r; y <= r; y += r / 6) ctx.lineTo(i * r * 0.42 + Math.sin(y / r * 6 + i) * r * 0.06 + Math.sin(y / r * 1.6) * i * r * 0.12, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    } else if (kind === "orange" || kind === "lemon") {
+      ctx.fillStyle = "rgba(0,0,0,.08)";
+      for (let i = 0; i < 18; i++) { const a = i * 2.4, d = (i % 6) / 6 * r * 0.8; circle(Math.cos(a) * d, Math.sin(a) * d, r * 0.045); ctx.fill(); }
+      if (kind === "lemon") { ctx.fillStyle = f.skin; circle(r * 0.98, 0, r * 0.14); ctx.fill(); circle(-r * 0.98, 0, r * 0.14); ctx.fill(); }
+      else { ctx.fillStyle = "#4b7a1a"; circle(0, -r * 0.88, r * 0.12); ctx.fill(); }
+    } else if (kind === "apple") {
+      ctx.strokeStyle = "#5a3412"; ctx.lineWidth = r * 0.12; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(0, -r * 0.75); ctx.quadraticCurveTo(r * 0.05, -r * 1.15, r * 0.18, -r * 1.25); ctx.stroke();
+      ctx.fillStyle = "#4fae2e";
+      ctx.beginPath(); ctx.ellipse(r * 0.38, -r * 1.05, r * 0.32, r * 0.14, -0.5, 0, Math.PI * 2); ctx.fill();
+    } else if (kind === "kiwi") {
+      ctx.strokeStyle = "rgba(40, 25, 8, .35)"; ctx.lineWidth = 1;
+      for (let i = 0; i < 26; i++) { const a = i * 2.4, d = ((i * 7) % 10) / 10 * r * 0.9; ctx.beginPath(); ctx.moveTo(Math.cos(a) * d, Math.sin(a) * d); ctx.lineTo(Math.cos(a) * d + 2, Math.sin(a) * d + 3); ctx.stroke(); }
+    } else if (kind === "coconut") {
+      ctx.strokeStyle = "rgba(25, 12, 2, .4)"; ctx.lineWidth = 1.4;
+      for (let i = 0; i < 14; i++) { const a = i * 1.7; ctx.beginPath(); ctx.arc(0, 0, r * (0.3 + (i % 5) * 0.14), a, a + 0.6); ctx.stroke(); }
+      ctx.fillStyle = "#2a1606"; for (const [ex, ey] of [[-0.25, -0.2], [0.18, -0.25], [0, 0.1]]) { circle(ex * r, ey * r, r * 0.09); ctx.fill(); }
+    }
+    // shine
+    ctx.fillStyle = "rgba(255,255,255,.28)";
+    ctx.beginPath(); ctx.ellipse(-r * 0.38, -r * 0.42, r * 0.28, r * 0.16, -0.7, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  // draws the upper half (y<0) of a sliced fruit, cut face toward the viewer
+  function drawHalf(kind, r) {
+    const f = FRUITS[kind];
+    const half = rr => { ctx.beginPath(); ctx.arc(0, 0, rr, Math.PI, 0); ctx.closePath(); };
+    ctx.save();
+    if (kind === "lemon") ctx.scale(1.18, 0.88);
+    ctx.fillStyle = f.dark; half(r); ctx.fill();
+    ctx.fillStyle = f.skin; half(r * 0.94); ctx.fill();
+    ctx.fillStyle = f.rind; half(r * (kind === "watermelon" ? 0.84 : 0.88)); ctx.fill();
+    ctx.fillStyle = f.flesh; half(r * (kind === "watermelon" ? 0.76 : kind === "coconut" ? 0.7 : 0.82)); ctx.fill();
+    if (kind === "watermelon") {
+      ctx.fillStyle = "#1a1a1a";
+      for (const [a, d] of [[-2.6, 0.5], [-2.0, 0.55], [-1.57, 0.45], [-1.1, 0.55], [-0.5, 0.5], [-1.9, 0.25], [-1.2, 0.25]]) {
+        ctx.save(); ctx.translate(Math.cos(a) * d * r, Math.sin(a) * d * r); ctx.rotate(a + Math.PI / 2);
+        ctx.beginPath(); ctx.ellipse(0, 0, r * 0.045, r * 0.08, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      }
+    } else if (kind === "orange" || kind === "lemon") {
+      ctx.strokeStyle = f.rind; ctx.lineWidth = Math.max(1.2, r * 0.05);
+      for (let i = 1; i < 6; i++) { const a = Math.PI + (i * Math.PI) / 6; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * r * 0.8, Math.sin(a) * r * 0.8); ctx.stroke(); }
+    } else if (kind === "apple") {
+      ctx.fillStyle = "#5a3412";
+      for (const sx of [-0.18, 0.18]) { ctx.beginPath(); ctx.ellipse(sx * r, -r * 0.2, r * 0.06, r * 0.11, sx * 2, 0, Math.PI * 2); ctx.fill(); }
+    } else if (kind === "kiwi") {
+      ctx.fillStyle = "#f4f7d8"; ctx.beginPath(); ctx.ellipse(0, 0, r * 0.28, r * 0.16, 0, Math.PI, 0); ctx.fill();
+      ctx.fillStyle = "#1b1b10";
+      for (let i = 0; i < 12; i++) { const a = Math.PI + (i + 0.5) * Math.PI / 12; circle(Math.cos(a) * r * 0.42, Math.sin(a) * r * 0.42, r * 0.045); ctx.fill(); }
+    } else if (kind === "plum") {
+      ctx.fillStyle = "#8a4a1a"; ctx.beginPath(); ctx.ellipse(0, 0, r * 0.32, r * 0.42, 0, Math.PI, 0); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function lighten(hex, amt) {
+    const n = parseInt(hex.slice(1), 16);
+    const c = s => clamp(((n >> s) & 255) + amt, 0, 255);
+    return `rgb(${c(16)},${c(8)},${c(0)})`;
+  }
+
+  function drawBomb(r, t) {
+    ctx.save();
+    // pulsing red glow
+    const glow = 0.35 + 0.25 * Math.sin(t * 10);
+    const gg = ctx.createRadialGradient(0, 0, r * 0.8, 0, 0, r * 1.6);
+    gg.addColorStop(0, `rgba(255, 40, 20, ${glow})`); gg.addColorStop(1, "rgba(255,40,20,0)");
+    ctx.fillStyle = gg; circle(0, 0, r * 1.6); ctx.fill();
+    const grad = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.1, 0, 0, r);
+    grad.addColorStop(0, "#6b6b75"); grad.addColorStop(0.5, "#24242a"); grad.addColorStop(1, "#08080a");
+    ctx.fillStyle = grad; circle(0, 0, r); ctx.fill();
+    // cap and fuse
+    ctx.fillStyle = "#4a4a52"; ctx.fillRect(-r * 0.25, -r * 1.12, r * 0.5, r * 0.25);
+    ctx.strokeStyle = "#c9a66b"; ctx.lineWidth = r * 0.1; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(0, -r * 1.12); ctx.quadraticCurveTo(r * 0.3, -r * 1.5, r * 0.55, -r * 1.35); ctx.stroke();
+    // spark
+    ctx.fillStyle = Math.random() < 0.5 ? "#fff6a0" : "#ff9a1f";
+    for (let i = 0; i < 5; i++) { const a = rand(0, 6.28), d = rand(0, r * 0.3); circle(r * 0.55 + Math.cos(a) * d, -r * 1.35 + Math.sin(a) * d, rand(1, r * 0.09)); ctx.fill(); }
+    // skull-ish X mark
+    ctx.strokeStyle = "rgba(255, 60, 40, .85)"; ctx.lineWidth = r * 0.12;
+    ctx.beginPath(); ctx.moveTo(-r * 0.25, -r * 0.25); ctx.lineTo(r * 0.25, r * 0.25); ctx.moveTo(r * 0.25, -r * 0.25); ctx.lineTo(-r * 0.25, r * 0.25); ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,.25)"; ctx.beginPath(); ctx.ellipse(-r * 0.4, -r * 0.42, r * 0.25, r * 0.13, -0.7, 0, 7); ctx.fill();
+    ctx.restore();
+  }
+
+  // ---------- audio ----------
+  let actx = null, noiseBuf = null, soundOn = localStorage.getItem("fn.sound") !== "off";
+  function audio() {
+    if (!soundOn) return null;
+    try {
+      if (!actx) {
+        actx = new (window.AudioContext || window.webkitAudioContext)();
+        noiseBuf = actx.createBuffer(1, actx.sampleRate * 1.5, actx.sampleRate);
+        const d = noiseBuf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      }
+      if (actx.state === "suspended") actx.resume();
+      return actx;
+    } catch { return null; }
+  }
+  function noise(dur, f0, f1, vol, type = "bandpass", q = 1.2) {
+    const a = audio(); if (!a) return;
+    const t = a.currentTime, s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+    s.buffer = noiseBuf; f.type = type; f.Q.value = q;
+    f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f).connect(g).connect(a.destination); s.start(t); s.stop(t + dur);
+  }
+  function tone(freq, dur, type, vol, to) {
+    const a = audio(); if (!a) return;
+    const t = a.currentTime, o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur);
+  }
+  const sfx = {
+    swish: () => noise(0.18, 1800, 5000, 0.12),
+    slice: () => { noise(0.12, 3000, 900, 0.25); noise(0.22, 500, 150, 0.35, "lowpass", 0.7); },
+    throw: () => noise(0.25, 300, 900, 0.04, "lowpass", 0.5),
+    combo: () => { tone(660, 0.12, "triangle", 0.12); setTimeout(() => tone(990, 0.2, "triangle", 0.12), 90); },
+    miss: () => tone(220, 0.3, "square", 0.06, 110),
+    boom: () => { noise(1.4, 1200, 40, 0.9, "lowpass", 0.6); tone(70, 1.0, "sine", 0.5, 30); },
+  };
+  function syncSound() { $("soundBtn").textContent = soundOn ? "🔊 sound on" : "🔇 sound off"; }
+  $("soundBtn").onclick = () => { soundOn = !soundOn; localStorage.setItem("fn.sound", soundOn ? "on" : "off"); syncSound(); };
+  syncSound();
+
+  // ---------- game state ----------
+  let state = "menu";          // menu | play | paused | boom | over
+  let mode = "classic";        // classic | zen
+  let things, pieces, drops, stains, popups, blades = new Map();
+  let menuChosen = false, score, lives, timeLeft, waveT, elapsed, boomT, boomAt, overDelay, menuFruits = [];
+  const bestOf = m => +localStorage.getItem("fn.best." + m) || 0;
+  const G = () => H * 1.15;
+
+  function resetWorld() { things = []; pieces = []; drops = []; stains = []; popups = []; }
+  resetWorld();
+
+  function launch(kind, opts = {}) {
+    const r = (kind === "bomb" ? 8.5 : FRUITS[kind].r) * U;
+    const x = opts.x ?? rand(W * 0.15, W * 0.85);
+    const apex = rand(H * 0.12, H * 0.45);           // highest point measured from the top
+    const rise = H + r - apex;
+    const vy = -Math.sqrt(2 * G() * rise);
+    const flight = (-vy / G()) * 2;
+    const tx = clamp(x + rand(-W * 0.35, W * 0.35), W * 0.12, W * 0.88);
+    things.push({
+      kind, r, x, y: H + r, vx: (tx - x) / flight, vy, rot: rand(0, 6.28), vr: rand(-3, 3), t: 0, sliced: false,
+    });
+  }
+
+  function wave() {
+    const level = mode === "zen" ? elapsed / 4 : score;
+    const maxN = Math.min(6, 1 + Math.floor(level / 12) + (Math.random() < 0.35 ? 1 : 0));
+    const n = 1 + Math.floor(Math.random() * maxN);
+    const stagger = Math.random() < 0.4;
+    for (let i = 0; i < n; i++) setTimeoutGame(() => { launch(pick(KINDS)); sfx.throw(); }, stagger ? i * 180 : rand(0, 60));
+    if (mode === "classic" && score > 4 && Math.random() < Math.min(0.45, 0.12 + score * 0.004)) {
+      const nb = score > 60 && Math.random() < 0.25 ? 2 : 1;
+      for (let i = 0; i < nb; i++) setTimeoutGame(() => launch("bomb"), rand(0, 400));
+    }
+    // breathing room between waves shrinks as you get better
+    waveT = Math.max(0.75, 2.3 - level * 0.018) + (stagger ? n * 0.18 : 0) + rand(0, 0.5);
+  }
+
+  // timers that respect pause (advanced inside update)
+  let timers = [];
+  function setTimeoutGame(fn, ms) { timers.push({ fn, t: ms / 1000 }); }
+
+  function sliceThing(o, ax, ay, bx, by, blade) {
+    o.sliced = true;
+    const a = Math.atan2(by - ay, bx - ax);
+    if (o.kind === "bomb") return explode(o);
+    const nx = Math.sin(a), ny = -Math.cos(a), sp = 70 * U / 10;
+    for (const side of [1, -1]) {
+      pieces.push({
+        kind: o.kind, r: o.r, x: o.x + nx * side * o.r * 0.15, y: o.y + ny * side * o.r * 0.15,
+        vx: o.vx * 0.6 + nx * side * sp * 6 + Math.cos(a) * 40, vy: Math.min(o.vy, 0) * 0.4 + ny * side * sp * 6 - 80,
+        rot: side === 1 ? a : a + Math.PI, vr: side * rand(1.5, 4),
+      });
+    }
+    const f = FRUITS[o.kind];
+    for (let i = 0; i < 16; i++) {
+      const ang = a + Math.PI / 2 * (Math.random() < 0.5 ? 1 : -1) + rand(-0.9, 0.9), v = rand(80, 420) * U / 6;
+      drops.push({ x: o.x, y: o.y, vx: Math.cos(ang) * v, vy: Math.sin(ang) * v - 60, r: rand(0.5, 1.6) * U, life: 1, color: f.juice });
+    }
+    stains.push({ x: o.x, y: o.y, r: o.r * rand(1.1, 1.6), a: 0.75, color: f.juice, rot: a, blobs: Array.from({ length: 7 }, () => [rand(-1, 1), rand(-1, 1), rand(0.15, 0.4)]) });
+    if (stains.length > 30) stains.shift();
+    sfx.slice();
+    if (navigator.vibrate) navigator.vibrate(12);
+    if (state === "play") {
+      score += f.pts;
+      blade.combo.push(o);
+      blade.comboT = 0.22;
+      updateHud();
+    }
+    return o;
+  }
+
+  function explode(o) {
+    if (state !== "play" || mode !== "classic") return;
+    state = "boom"; boomT = 0; boomAt = { x: o.x, y: o.y };
+    sfx.boom();
+    if (navigator.vibrate) navigator.vibrate([80, 40, 200]);
+  }
+
+  function finishCombo(blade) {
+    const n = blade.combo.length;
+    if (n >= 3 && state === "play") {
+      score += n;
+      const last = blade.combo[n - 1];
+      popups.push({ text: `${n} FRUIT COMBO`, sub: `+${n}`, x: clamp(last.x, W * 0.25, W * 0.75), y: clamp(last.y, H * 0.2, H * 0.8), life: 1.3, big: true });
+      sfx.combo();
+      updateHud();
+    }
+    blade.combo = [];
+  }
+
+  function missFruit(o) {
+    if (state !== "play" || mode !== "classic") return;
+    lives--;
+    sfx.miss();
+    popups.push({ text: "✕", x: clamp(o.x, 30, W - 30), y: H - 40, life: 1.0, miss: true });
+    updateHud();
+    if (lives <= 0) { state = "boom"; boomT = 0; boomAt = null; }
+  }
+
+  function updateHud() {
+    $("score").textContent = score;
+    const b = bestOf(mode);
+    $("scoreBest").textContent = "Best: " + Math.max(b, score);
+    [...$("lives").children].forEach((s, i) => s.classList.toggle("lost", i < 3 - lives));
+    $("lives").style.display = mode === "classic" ? "" : "none";
+    $("timer").textContent = mode === "zen" ? Math.ceil(Math.max(0, timeLeft)) + "s" : "";
+  }
+
+  // ---------- input: blades ----------
+  function segDist(px, py, ax, ay, bx, by) {
+    const dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy || 1;
+    const t = clamp(((px - ax) * dx + (py - ay) * dy) / l2, 0, 1);
+    return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+  }
+
+  function bladeMove(b, x, y) {
+    const now = performance.now() / 1000;
+    const last = b.pts[b.pts.length - 1];
+    if (last && Math.hypot(x - last.x, y - last.y) < 1.5) return;
+    b.pts.push({ x, y, t: now });
+    if (!last) return;
+    const dist = Math.hypot(x - last.x, y - last.y);
+    b.travel += dist;
+    if (b.travel > U * 12 && now - b.lastSwish > 0.25) { sfx.swish(); b.lastSwish = now; b.travel = 0; }
+    if (state !== "play" && state !== "menu") return;
+    const pool = state === "menu" ? menuFruits : things;
+    for (const o of pool) {
+      if (o.sliced) continue;
+      if (segDist(o.x, o.y, last.x, last.y, x, y) < o.r * 0.95) {
+        sliceThing(o, last.x, last.y, x, y, b);
+        if (state === "menu") { if (!menuChosen) { menuChosen = true; setTimeout(() => startGame(o.mode), 450); } return; }
+      }
+    }
+  }
+
+  canvas.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    try { canvas.setPointerCapture(e.pointerId); } catch {}
+    const b = { pts: [], travel: 0, lastSwish: 0, combo: [], comboT: 0, down: true };
+    blades.set(e.pointerId, b);
+    bladeMove(b, e.clientX, e.clientY);
+  });
+  canvas.addEventListener("pointermove", e => {
+    const b = blades.get(e.pointerId);
+    if (!b || !b.down) return;
+    const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    for (const ce of (evs.length ? evs : [e])) bladeMove(b, ce.clientX, ce.clientY);
+  });
+  const endBlade = e => { const b = blades.get(e.pointerId); if (b) { b.down = false; finishCombo(b); } };
+  canvas.addEventListener("pointerup", endBlade);
+  canvas.addEventListener("pointercancel", endBlade);
+
+  // ---------- update ----------
+  function update(dt) {
+    const now = performance.now() / 1000;
+    for (const [id, b] of blades) {
+      b.pts = b.pts.filter(p => now - p.t < 0.16);
+      if (b.comboT > 0) { b.comboT -= dt; if (b.comboT <= 0) finishCombo(b); }
+      if (!b.down && !b.pts.length) blades.delete(id);
+    }
+
+    for (const s of stains) s.a -= dt * 0.12;
+    stains = stains.filter(s => s.a > 0);
+    for (const p of popups) { p.life -= dt; p.y -= dt * 30; }
+    popups = popups.filter(p => p.life > 0);
+
+    if (state === "menu") {
+      for (const m of menuFruits) { m.rot += dt * 0.8; if (m.sliced) m.hidden = true; }
+      physics(dt);
+      return;
+    }
+    if (state === "paused" || state === "over") return;
+
+    if (state === "boom") {
+      boomT += dt;
+      physics(dt * (boomAt ? 0.15 : 1));
+      if (boomT > (boomAt ? 1.6 : 0.9)) showOver();
+      return;
+    }
+
+    elapsed += dt;
+    for (const tm of timers) { tm.t -= dt; if (tm.t <= 0) { tm.done = true; tm.fn(); } }
+    timers = timers.filter(tm => !tm.done);
+    waveT -= dt;
+    if (waveT <= 0) wave();
+
+    if (mode === "zen") {
+      timeLeft -= dt;
+      $("timer").textContent = Math.ceil(Math.max(0, timeLeft)) + "s";
+      if (timeLeft <= 0) { state = "boom"; boomT = 0; boomAt = null; return; }
+    }
+    physics(dt);
+  }
+
+  function physics(dt) {
+    const g = G();
+    for (const o of things) {
+      o.vy += g * dt; o.x += o.vx * dt; o.y += o.vy * dt; o.rot += o.vr * dt; o.t += dt;
+      if (!o.sliced && o.vy > 0 && o.y - o.r > H) { o.gone = true; if (o.kind !== "bomb") missFruit(o); }
+    }
+    things = things.filter(o => !o.gone && !o.sliced);
+    for (const p of pieces) { p.vy += g * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt; }
+    pieces = pieces.filter(p => p.y - p.r < H + 50);
+    for (const d of drops) { d.vy += g * 0.8 * dt; d.x += d.vx * dt; d.y += d.vy * dt; d.life -= dt * 1.5; }
+    drops = drops.filter(d => d.life > 0);
+  }
+
+  // ---------- draw ----------
+  function draw(now) {
+    const t = now / 1000;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.drawImage(wood, 0, 0, W, H);
+
+    for (const s of stains) {
+      ctx.globalAlpha = Math.max(0, s.a) * 0.55; ctx.fillStyle = s.color;
+      ctx.save(); ctx.translate(s.x, s.y); ctx.rotate(s.rot);
+      ctx.beginPath(); ctx.ellipse(0, 0, s.r, s.r * 0.55, 0, 0, Math.PI * 2); ctx.fill();
+      for (const [bx, by, br] of s.blobs) { circle(bx * s.r * 1.3, by * s.r * 0.9, br * s.r); ctx.fill(); }
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+
+    if (state === "menu") drawMenu(t);
+
+    for (const p of pieces) { ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); drawHalf(p.kind, p.r); ctx.restore(); }
+    for (const o of things) {
+      ctx.save(); ctx.translate(o.x, o.y);
+      ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.beginPath(); ctx.ellipse(o.r * 0.25, o.r * 0.35, o.r, o.r * 0.9, 0, 0, 7); ctx.fill();
+      ctx.rotate(o.rot);
+      if (o.kind === "bomb") drawBomb(o.r, t); else drawWhole(o.kind, o.r, t);
+      ctx.restore();
+    }
+    for (const d of drops) { ctx.globalAlpha = Math.max(0, d.life); ctx.fillStyle = d.color; circle(d.x, d.y, d.r); ctx.fill(); }
+    ctx.globalAlpha = 1;
+
+    drawBlades();
+
+    for (const p of popups) {
+      ctx.globalAlpha = clamp(p.life * 2, 0, 1);
+      ctx.textAlign = "center"; ctx.lineJoin = "round";
+      if (p.miss) {
+        ctx.font = `900 ${Math.round(8 * U)}px "Trebuchet MS", sans-serif`;
+        ctx.fillStyle = "#ff3b30"; ctx.strokeStyle = "#3a0a05"; ctx.lineWidth = 5;
+        ctx.strokeText(p.text, p.x, p.y); ctx.fillText(p.text, p.x, p.y);
+      } else {
+        const sz = Math.round(clamp(6 * U, 22, 46));
+        ctx.font = `900 ${sz}px "Trebuchet MS", sans-serif`;
+        ctx.strokeStyle = "#5a2a05"; ctx.lineWidth = 6; ctx.fillStyle = "#ffd23f";
+        ctx.strokeText(p.text, p.x, p.y); ctx.fillText(p.text, p.x, p.y);
+        ctx.font = `900 ${Math.round(sz * 1.3)}px "Trebuchet MS", sans-serif`; ctx.fillStyle = "#fff";
+        ctx.strokeText(p.sub, p.x, p.y + sz * 1.3); ctx.fillText(p.sub, p.x, p.y + sz * 1.3);
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    if (state === "boom" && boomAt) drawBoom(t);
+    else if (state === "boom" && !boomAt) {
+      ctx.fillStyle = `rgba(120, 0, 0, ${Math.min(0.35, boomT * 0.5)})`; ctx.fillRect(0, 0, W, H);
+    }
+  }
+
+  function drawBlades() {
+    const now = performance.now() / 1000;
+    for (const b of blades.values()) {
+      const pts = b.pts;
+      if (pts.length < 2) continue;
+      ctx.lineCap = "round"; ctx.lineJoin = "round";
+      for (const pass of [{ c: "rgba(140, 200, 255, .35)", w: 2.2 }, { c: "#ffffff", w: 1 }]) {
+        for (let i = 1; i < pts.length; i++) {
+          const age = (now - pts[i].t) / 0.16, k = 1 - clamp(age, 0, 1);
+          const along = i / pts.length;
+          ctx.strokeStyle = pass.c;
+          ctx.lineWidth = Math.max(0.8, U * 2.2 * pass.w * k * (0.25 + 0.75 * along));
+          ctx.beginPath(); ctx.moveTo(pts[i - 1].x, pts[i - 1].y); ctx.lineTo(pts[i].x, pts[i].y); ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function drawBoom(t) {
+    const k = clamp(boomT / 1.2, 0, 1);
+    ctx.save(); ctx.translate(boomAt.x, boomAt.y);
+    const rays = 14, len = Math.max(W, H) * (0.2 + k * 1.4);
+    ctx.fillStyle = `rgba(255, 255, 240, ${0.85})`;
+    for (let i = 0; i < rays; i++) {
+      const a = (i / rays) * Math.PI * 2 + boomT * 0.4;
+      ctx.beginPath(); ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(a - 0.06) * len, Math.sin(a - 0.06) * len);
+      ctx.lineTo(Math.cos(a + 0.06) * len, Math.sin(a + 0.06) * len); ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+    ctx.fillStyle = `rgba(255,255,255,${clamp((boomT - 0.6) * 1.6, 0, 1)})`; ctx.fillRect(0, 0, W, H);
+  }
+
+  // ---------- menu: slice a fruit to choose a mode ----------
+  function placeMenuFruits() {
+    const portrait = H > W;
+    const r = (portrait ? 15 : 13) * U;
+    const y = portrait ? H * 0.62 : H * 0.64;
+    const dx = portrait ? W * 0.25 : Math.min(W * 0.18, 30 * U);
+    menuFruits = [
+      { kind: "watermelon", mode: "classic", label: "CLASSIC", x: W / 2 - dx, y, r, rot: 0, vx: 0, vy: 0, sliced: false },
+      { kind: "orange", mode: "zen", label: "ZEN", x: W / 2 + dx, y, r: r * 0.85, rot: 1, vx: 0, vy: 0, sliced: false },
+    ];
+  }
+
+  function drawMenu(t) {
+    for (const m of menuFruits) {
+      if (m.hidden) continue;
+      // spinning ring
+      ctx.save(); ctx.translate(m.x, m.y);
+      ctx.strokeStyle = "rgba(255, 230, 150, .55)"; ctx.lineWidth = U * 0.9; ctx.setLineDash([U * 3, U * 2]);
+      ctx.lineDashOffset = -t * 40;
+      circle(0, 0, m.r * 1.45); ctx.stroke(); ctx.setLineDash([]);
+      ctx.rotate(m.rot); drawWhole(m.kind, m.r, t); ctx.restore();
+      ctx.textAlign = "center"; ctx.font = `900 ${Math.round(clamp(5 * U, 18, 34))}px "Trebuchet MS", sans-serif`;
+      ctx.lineWidth = 5; ctx.strokeStyle = "#3a1a05"; ctx.fillStyle = "#fff";
+      ctx.strokeText(m.label, m.x, m.y + m.r * 1.45 + clamp(7 * U, 26, 46));
+      ctx.fillText(m.label, m.x, m.y + m.r * 1.45 + clamp(7 * U, 26, 46));
+      const sub = m.mode === "classic" ? "3 lives · avoid bombs" : "90 seconds · no bombs";
+      ctx.font = `600 ${Math.round(clamp(3 * U, 12, 18))}px "Trebuchet MS", sans-serif`; ctx.lineWidth = 4;
+      const sy = m.y + m.r * 1.45 + clamp(7 * U, 26, 46) + clamp(4.5 * U, 18, 28);
+      ctx.strokeText(sub, m.x, sy); ctx.fillText(sub, m.x, sy);
+      const b = bestOf(m.mode);
+      if (b) { ctx.fillStyle = "#ffd23f"; ctx.strokeText("best " + b, m.x, sy + clamp(4 * U, 16, 24)); ctx.fillText("best " + b, m.x, sy + clamp(4 * U, 16, 24)); }
+    }
+  }
+
+  // ---------- screens ----------
+  const show = (el, on) => $(el).classList.toggle("hidden", !on);
+
+  function startGame(m) {
+    mode = m;
+    things = []; popups = []; timers = []; // keep flying halves & juice from the menu slice
+    score = 0; lives = 3; timeLeft = 90; elapsed = 0; waveT = 0.6;
+    state = "play";
+    show("title", false); show("over", false); show("paused", false);
+    $("soundBtn").style.display = "none"; $("homeLink").style.display = "none";
+    $("hud").style.display = "block"; $("pauseBtn").style.display = "block";
+    updateHud();
+  }
+
+  function showOver() {
+    state = "over";
+    const best = bestOf(mode), isBest = score > best;
+    if (isBest) localStorage.setItem("fn.best." + mode, score);
+    $("overTitle").textContent = mode === "zen" ? "Time's up!" : "Game Over";
+    $("reason").textContent = mode === "zen" ? "Zen mode" : boomAt ? "💣 You sliced a bomb!" : "You dropped 3 fruits.";
+    $("finalScore").textContent = score;
+    $("newBest").style.display = isBest && score > 0 ? "block" : "none";
+    $("bestOver").textContent = "Best: " + Math.max(best, score);
+    $("pauseBtn").style.display = "none";
+    show("over", true);
+  }
+
+  function showMenu() {
+    state = "menu"; menuChosen = false;
+    resetWorld(); timers = [];
+    placeMenuFruits();
+    show("over", false); show("paused", false); show("title", true);
+    $("soundBtn").style.display = ""; $("homeLink").style.display = "";
+    $("hud").style.display = "none"; $("pauseBtn").style.display = "none";
+  }
+
+  function pause() { if (state === "play") { state = "paused"; show("paused", true); } }
+  function resume() { if (state === "paused") { state = "play"; show("paused", false); last = performance.now(); } }
+
+  $("againBtn").onclick = () => startGame(mode);
+  $("menuBtn").onclick = showMenu;
+  $("quitBtn").onclick = showMenu;
+  $("resumeBtn").onclick = resume;
+  $("pauseBtn").onclick = pause;
+  document.addEventListener("visibilitychange", () => { if (document.hidden) pause(); });
+  window.addEventListener("keydown", e => {
+    if (e.key === "Escape" || e.key === "p") state === "paused" ? resume() : pause();
+  });
+  window.addEventListener("resize", resize);
+
+  // ---------- loop ----------
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(1 / 30, (now - last) / 1000);
+    last = now;
+    update(dt);
+    draw(now);
+    requestAnimationFrame(frame);
+  }
+
+  resize();
+  showMenu();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

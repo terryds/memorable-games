@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#4ec0ca">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Flappy Bird</title>
+<style>
+  html, body {
+    margin: 0; height: 100%; overflow: hidden; background: #2a2a2a;
+    user-select: none; -webkit-user-select: none; touch-action: none; overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  canvas {
+    position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    image-rendering: pixelated; image-rendering: crisp-edges; display: block;
+  }
+  .homeLink {
+    position: absolute; top: calc(env(safe-area-inset-top) + 10px); left: 10px; z-index: 20;
+    padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.38); color: #fff !important;
+    font: 700 13px system-ui, -apple-system, "Segoe UI", sans-serif; text-decoration: none; letter-spacing: .2px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .homeLink:active { transform: scale(.96); }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<a class="homeLink" id="homeLink" style="position:fixed" href="../">← All games</a>
+<script>
+(() => {
+  const canvas = document.getElementById("c");
+  const homeLink = document.getElementById("homeLink");
+  const ctx = canvas.getContext("2d");
+
+  // ---------- logical resolution (the original runs at 288 x 512) ----------
+  const W = 288, GROUND_H = 112;
+  let H = 512, GROUND_Y = H - GROUND_H;
+
+  function resize() {
+    const vw = window.innerWidth, vh = window.innerHeight;
+    H = vw / vh < W / 512 ? Math.round(W * vh / vw) : 512;   // tall phones get a taller sky
+    GROUND_Y = H - GROUND_H;
+    canvas.width = W; canvas.height = H;
+    const scale = Math.min(vw / W, vh / H);
+    canvas.style.width = Math.round(W * scale) + "px";
+    canvas.style.height = Math.round(H * scale) + "px";
+    ctx.imageSmoothingEnabled = false;
+    buildBackgrounds();
+  }
+
+  // ---------- physics (per 60 Hz tick, like the original) ----------
+  const GRAVITY = 0.25, FLAP = -4.6, MAX_FALL = 8;
+  const PIPE_W = 52, PIPE_GAP = 100, PIPE_SPACING = 156, SPEED = 2;
+  const BIRD_X = 70, BIRD_R = 11;
+
+  // ---------- pixel sprites ----------
+  const BIRD_BODY = [
+    "......kkkkkk.....",
+    "....kkyyyykwwk...",
+    "...kyyyyykwwwwk..",
+    "..kyyyyyykwwwkwk.",
+    ".kyyyyyyykwwwkwk.",
+    ".kyyyyyyyykwwwwk.",
+    "kyyyyyyyyyykkkkkk",
+    "kyyyyyyyyykrrrrrk",
+    "kyyyyoooookrkkkkk",
+    ".koooooooookrrrrk",
+    "..kkoooooooookkkk",
+    ".....kkkkkk......",
+  ];
+  const WINGS = [
+    [".kkkk.", "kwwwwk", "kwwwk.", "kkkk.."],   // up
+    ["kkkkk.", "kwwwwk", "kwwwwk", ".kkkk."],   // mid
+    ["kkkk..", "kwwwk.", "kwwwwk", ".kkkk."],   // down
+  ];
+  const BIRD_COLORS = [
+    { y: "#f8c838", o: "#e86101", w: "#ffffff" },   // yellow
+    { y: "#5fc7f5", o: "#2a7fd4", w: "#ffffff" },   // blue
+    { y: "#f05a3c", o: "#b8241a", w: "#ffffff" },   // red
+  ];
+
+  function sprite(rows, pal) {
+    const c = document.createElement("canvas");
+    c.width = rows[0].length; c.height = rows.length;
+    const g = c.getContext("2d");
+    rows.forEach((row, y) => [...row].forEach((ch, x) => {
+      if (pal[ch]) { g.fillStyle = pal[ch]; g.fillRect(x, y, 1, 1); }
+    }));
+    return c;
+  }
+
+  function birdFrames(colorIdx) {
+    const col = BIRD_COLORS[colorIdx];
+    const pal = { k: "#543847", y: col.y, o: col.o, w: col.w, r: "#f85800" };
+    const body = sprite(BIRD_BODY, pal);
+    return WINGS.map(wing => {
+      const c = document.createElement("canvas");
+      c.width = 17; c.height = 12;
+      const g = c.getContext("2d");
+      g.drawImage(body, 0, 0);
+      g.drawImage(sprite(wing, { k: "#543847", w: "#fbf4dc" }), 0, 4);
+      return c;
+    });
+  }
+
+  // ---------- pixel digits ----------
+  const DIGITS = {
+    0: [".###.", "#...#", "#...#", "#...#", "#...#", "#...#", ".###."],
+    1: ["..#..", ".##..", "..#..", "..#..", "..#..", "..#..", ".###."],
+    2: [".###.", "#...#", "....#", "...#.", "..#..", ".#...", "#####"],
+    3: ["####.", "....#", "....#", ".###.", "....#", "....#", "####."],
+    4: ["...#.", "..##.", ".#.#.", "#..#.", "#####", "...#.", "...#."],
+    5: ["#####", "#....", "####.", "....#", "....#", "#...#", ".###."],
+    6: [".###.", "#....", "#....", "####.", "#...#", "#...#", ".###."],
+    7: ["#####", "....#", "...#.", "..#..", ".#...", ".#...", ".#..."],
+    8: [".###.", "#...#", "#...#", ".###.", "#...#", "#...#", ".###."],
+    9: [".###.", "#...#", "#...#", ".####", "....#", "....#", ".###."],
+  };
+  function drawNumber(n, cx, y, s, align = "center") {
+    const str = String(n), cw = 5 * s + s;           // digit width + spacing
+    const total = str.length * cw - s;
+    let x = align === "center" ? Math.round(cx - total / 2) : align === "right" ? cx - total : cx;
+    for (const pass of ["#000", "#fff"]) {
+      let px = x;
+      for (const ch of str) {
+        DIGITS[ch].forEach((row, ry) => [...row].forEach((c, rx) => {
+          if (c !== "#") return;
+          ctx.fillStyle = pass;
+          if (pass === "#000") { const o = s >= 4 ? 2 : 1; ctx.fillRect(px + rx * s - o, y + ry * s - o, s + o * 2, s + o * 2); }
+          else ctx.fillRect(px + rx * s, y + ry * s, s, s);
+        }));
+        px += cw;
+      }
+    }
+  }
+
+  function title(text, cx, y, fill, size) {
+    ctx.font = `900 ${size}px "Trebuchet MS", "Arial Black", sans-serif`;
+    ctx.textAlign = "center"; ctx.textBaseline = "top"; ctx.lineJoin = "round";
+    ctx.strokeStyle = "#543847"; ctx.lineWidth = 8; ctx.strokeText(text, cx, y);
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = 4; ctx.strokeText(text, cx, y);
+    ctx.fillStyle = fill; ctx.fillText(text, cx, y);
+  }
+
+  // ---------- backgrounds (day / night), drawn once as a tileable strip ----------
+  let bgDay, bgNight, groundTile;
+  function buildBackgrounds() {
+    bgDay = makeBg(false); bgNight = makeBg(true);
+    groundTile = document.createElement("canvas");
+    groundTile.width = 24; groundTile.height = GROUND_H;
+    const g = groundTile.getContext("2d");
+    g.fillStyle = "#ded895"; g.fillRect(0, 0, 24, GROUND_H);
+    g.fillStyle = "#543847"; g.fillRect(0, 0, 24, 1);
+    g.fillStyle = "#e4fd8b"; g.fillRect(0, 1, 24, 2);
+    g.fillStyle = "#9ce659"; g.fillRect(0, 3, 24, 9);
+    g.fillStyle = "#73bf2e";
+    for (let i = 0; i < 9; i++) g.fillRect((i + 12) % 24, 3 + i, 12, 1);   // diagonal stripes
+    g.fillStyle = "#558022"; g.fillRect(0, 12, 24, 2);
+    g.fillStyle = "#d7a84c"; g.fillRect(0, 14, 24, 2);
+  }
+
+  function makeBg(night) {
+    const c = document.createElement("canvas");
+    c.width = W; c.height = H;
+    const g = c.getContext("2d");
+    g.fillStyle = night ? "#0d8a99" : "#4ec0ca"; g.fillRect(0, 0, W, H);
+    if (night) {
+      g.fillStyle = "#e9fcd9";
+      for (let i = 0; i < 40; i++) g.fillRect((i * 73) % W, (i * 37) % (GROUND_Y - 160), 1, 1);
+    }
+    const base = GROUND_Y;
+    // clouds
+    g.fillStyle = night ? "#3fa8b2" : "#e9fcd9";
+    for (let x = -10; x < W + 20; x += 22) {
+      const r = 14 + ((x * 7) % 9);
+      g.beginPath(); g.arc(x, base - 92, r, 0, Math.PI * 2); g.fill();
+    }
+    g.fillRect(0, base - 92, W, 40);
+    // city skyline
+    const bcol = night ? "#2b6f73" : "#d7f0c4", wcol = night ? "#f2e27a" : "#b5e2c9";
+    let x = 0, i = 0;
+    while (x < W) {
+      const bw = 14 + ((i * 11) % 18), bh = 22 + ((i * 29) % 34);
+      g.fillStyle = bcol; g.fillRect(x, base - 30 - bh, bw, bh + 30);
+      g.fillStyle = wcol;
+      for (let wy = base - 26 - bh; wy < base - 30; wy += 6) for (let wx = x + 3; wx < x + bw - 3; wx += 5) g.fillRect(wx, wy, 2, 2);
+      x += bw + 1; i++;
+    }
+    // bushes
+    g.fillStyle = night ? "#1f8a3c" : "#5ee270";
+    for (let bx = -6; bx < W + 20; bx += 18) {
+      const r = 10 + ((bx * 5) % 7);
+      g.beginPath(); g.arc(bx, base - 18, r, 0, Math.PI * 2); g.fill();
+    }
+    g.fillRect(0, base - 18, W, 18);
+    g.fillStyle = night ? "#17702f" : "#4ec653";
+    g.fillRect(0, base - 4, W, 4);
+    return c;
+  }
+
+  // ---------- pipes ----------
+  function drawPipe(x, topH) {
+    const bottomY = topH + PIPE_GAP;
+    pipeRect(x + 2, -2, PIPE_W - 4, topH - 22);          // top body
+    pipeCap(x, topH - 24);                               // top cap
+    pipeRect(x + 2, bottomY + 24, PIPE_W - 4, GROUND_Y - bottomY - 24);
+    pipeCap(x, bottomY);
+  }
+  function pipeShade(x, y, w, h) {
+    // horizontal gradient bands like the original sprite
+    const bands = [["#558022", 0.04], ["#9ce659", 0.12], ["#e4fd8b", 0.08], ["#9ce659", 0.16], ["#73bf2e", 0.36], ["#558022", 0.24]];
+    let bx = x;
+    for (const [col, frac] of bands) {
+      const bw = Math.max(1, Math.round(w * frac));
+      ctx.fillStyle = col; ctx.fillRect(bx, y, bw, h); bx += bw;
+    }
+    if (bx < x + w) { ctx.fillStyle = "#558022"; ctx.fillRect(bx, y, x + w - bx, h); }
+    ctx.fillStyle = "#543847";
+    ctx.fillRect(x - 1, y, 1, h); ctx.fillRect(x + w, y, 1, h);
+  }
+  function pipeRect(x, y, w, h) { if (h > 0) pipeShade(x, y, w, h); }
+  function pipeCap(x, y) {
+    pipeShade(x, y, PIPE_W, 24);
+    ctx.fillStyle = "#543847";
+    ctx.fillRect(x - 1, y, PIPE_W + 2, 1); ctx.fillRect(x - 1, y + 23, PIPE_W + 2, 1);
+  }
+
+  // ---------- audio ----------
+  let actx = null;
+  function audio() {
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === "suspended") actx.resume();
+      return actx;
+    } catch { return null; }
+  }
+  function tone(f0, f1, dur, type = "square", vol = 0.06, delay = 0) {
+    const a = audio(); if (!a) return;
+    const t = a.currentTime + delay, o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + 0.02);
+  }
+  const sfx = {
+    wing: () => tone(500, 900, 0.07, "triangle", 0.06),
+    point: () => { tone(1040, 1040, 0.08, "square", 0.04); tone(1560, 1560, 0.16, "square", 0.04, 0.08); },
+    hit: () => { tone(240, 60, 0.12, "square", 0.09); tone(120, 40, 0.18, "sawtooth", 0.06); },
+    die: () => tone(700, 120, 0.5, "triangle", 0.06, 0.15),
+    swoosh: () => tone(300, 1200, 0.18, "sine", 0.03),
+  };
+
+  // ---------- game state ----------
+  let state = "ready";      // ready | play | dying | over
+  let bird, pipes, score, best = +localStorage.getItem("flappy.best") || 0, newBest;
+  let frames, groundX, bgX, flash, overT, night, tick = 0;
+
+  function reset() {
+    night = Math.random() < 0.35;
+    frames = birdFrames((Math.random() * 3) | 0);
+    bird = { y: H * 0.42, vy: 0, rot: 0, frame: 1, flapT: 0 };
+    pipes = []; score = 0; newBest = false; flash = 0; overT = 0;
+    groundX = groundX || 0; bgX = bgX || 0;
+    state = "ready";
+  }
+
+  function addPipe(x) {
+    const minTop = 50, maxTop = GROUND_Y - PIPE_GAP - 50;
+    pipes.push({ x, top: Math.round(minTop + Math.random() * (maxTop - minTop)), scored: false });
+  }
+
+  function flap() {
+    if (state === "ready") {
+      state = "play";
+      addPipe(W + 60);
+      addPipe(W + 60 + PIPE_SPACING);
+    }
+    if (state === "play") {
+      bird.vy = FLAP;
+      sfx.wing();
+    } else if (state === "over" && overT > 0.9) {
+      sfx.swoosh();
+      reset();
+    }
+  }
+
+  function die(hitPipe) {
+    state = "dying"; flash = 1;
+    sfx.hit();
+    if (navigator.vibrate) navigator.vibrate(60);
+    if (hitPipe) sfx.die();
+    if (score > best) { best = score; newBest = true; localStorage.setItem("flappy.best", best); }
+  }
+
+  function hitsRect(cx, cy, r, x, y, w, h) {
+    const nx = Math.max(x, Math.min(cx, x + w)), ny = Math.max(y, Math.min(cy, y + h));
+    return (cx - nx) ** 2 + (cy - ny) ** 2 < r * r;
+  }
+
+  function step() {
+    tick++;
+    if (flash > 0) flash = Math.max(0, flash - 0.08);
+    const scrolling = state === "ready" || state === "play";
+    if (scrolling) {
+      groundX = (groundX + SPEED) % 24;
+      bgX = (bgX + SPEED * 0.25) % W;
+    }
+
+    // wing animation
+    if (state !== "dying" && state !== "over") {
+      bird.flapT++;
+      if (bird.flapT % 5 === 0) bird.frame = (bird.frame + 1) % 4;
+    }
+
+    if (state === "ready") {
+      bird.y = H * 0.42 + Math.sin(tick / 9) * 4;
+      bird.rot = 0;
+      return;
+    }
+
+    if (state === "play" || state === "dying") {
+      bird.vy = Math.min(MAX_FALL, bird.vy + GRAVITY);
+      bird.y += bird.vy;
+      if (bird.y < -20) { bird.y = -20; bird.vy = 0; }
+      // tilt: nose up right after a flap, dive when falling fast
+      if (bird.vy < 0) bird.rot = Math.max(-0.45, bird.rot - 0.2);
+      else if (bird.vy > 3) bird.rot = Math.min(Math.PI / 2, bird.rot + 0.08);
+      if (state === "dying") bird.rot = Math.min(Math.PI / 2, bird.rot + 0.12);
+
+      if (bird.y + BIRD_R >= GROUND_Y) {
+        bird.y = GROUND_Y - BIRD_R;
+        if (state === "play") die(false);
+        state = "over"; overT = 0;
+      }
+    }
+
+    if (state === "play") {
+      for (const p of pipes) {
+        p.x -= SPEED;
+        if (!p.scored && p.x + PIPE_W / 2 < BIRD_X) { p.scored = true; score++; sfx.point(); }
+        if (hitsRect(BIRD_X, bird.y, BIRD_R, p.x, -1000, PIPE_W, p.top + 1000) ||
+            hitsRect(BIRD_X, bird.y, BIRD_R, p.x, p.top + PIPE_GAP, PIPE_W, GROUND_Y)) { die(true); break; }
+      }
+      if (pipes.length && pipes[0].x < -PIPE_W - 4) pipes.shift();
+      const lastP = pipes[pipes.length - 1];
+      if (lastP && lastP.x < W + 60) addPipe(lastP.x + PIPE_SPACING);
+    }
+
+    if (state === "over") overT += 1 / 60;
+  }
+
+  // ---------- drawing ----------
+  function drawBird() {
+    const img = frames[[0, 1, 2, 1][bird.frame]];
+    ctx.save();
+    ctx.translate(BIRD_X, Math.round(bird.y));
+    ctx.rotate(bird.rot);
+    ctx.drawImage(img, -17, -12, 34, 24);
+    ctx.restore();
+  }
+
+  function drawGround() {
+    ctx.save();
+    ctx.translate(-Math.round(groundX), GROUND_Y);
+    for (let x = 0; x < W + 24; x += 24) ctx.drawImage(groundTile, x, 0);
+    ctx.restore();
+  }
+
+  function medal(sc) {
+    if (sc >= 40) return { c: "#e5e4e2", d: "#a9b4bd", n: "PLATINUM" };
+    if (sc >= 30) return { c: "#f8d030", d: "#c89010", n: "GOLD" };
+    if (sc >= 20) return { c: "#d8d8e0", d: "#9a9aa8", n: "SILVER" };
+    if (sc >= 10) return { c: "#e0975a", d: "#a8622a", n: "BRONZE" };
+    return null;
+  }
+
+  function drawReady() {
+    title("Get Ready!", W / 2, H * 0.2, "#7ad13a", 34);
+    // tap hint
+    const cx = W / 2 + 4, cy = H * 0.42 + 6;
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = "#fff"; ctx.strokeStyle = "#543847"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(cx + 34, cy, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#e86101"; ctx.font = '900 13px "Trebuchet MS", sans-serif'; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("TAP", cx + 34, cy + 1);
+    ctx.fillStyle = "#fff";
+    for (const [dx, dy] of [[-4, -26], [10, -26], [24, -22]]) {
+      ctx.fillRect(cx + 34 + dx - 6, cy + dy - 6, 3, 6);
+    }
+    ctx.globalAlpha = 1;
+    ctx.font = '700 12px "Trebuchet MS", sans-serif'; ctx.fillStyle = "#fff"; ctx.textBaseline = "top";
+    ctx.strokeStyle = "#543847"; ctx.lineWidth = 3;
+    const hint = "tap / click / space to flap";
+    ctx.strokeText(hint, W / 2, H * 0.42 + 44); ctx.fillText(hint, W / 2, H * 0.42 + 44);
+    if (best) drawNumberLabel("BEST " + best, W / 2, H * 0.42 + 62);
+  }
+  function drawNumberLabel(t, x, y) {
+    ctx.font = '900 13px "Trebuchet MS", sans-serif'; ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ctx.strokeStyle = "#543847"; ctx.lineWidth = 3; ctx.strokeText(t, x, y);
+    ctx.fillStyle = "#fcc33b"; ctx.fillText(t, x, y);
+  }
+
+  function drawOver() {
+    const t = overT;
+    // "Game Over" drops in
+    const ty = H * 0.18 + Math.max(0, 1 - t / 0.25) * -20;
+    ctx.globalAlpha = Math.min(1, t / 0.2);
+    title("Game Over", W / 2, ty, "#f8a838", 36);
+    ctx.globalAlpha = 1;
+    // score panel slides up
+    const k = Math.min(1, Math.max(0, (t - 0.3) / 0.35));
+    const py = H * 0.34 + (1 - k * k * (3 - 2 * k)) * (H * 0.7);
+    const px = (W - 226) / 2, pw = 226, ph = 116;
+    ctx.fillStyle = "#543847"; ctx.fillRect(px - 2, py - 2, pw + 4, ph + 4);
+    ctx.fillStyle = "#ded895"; ctx.fillRect(px, py, pw, ph);
+    ctx.fillStyle = "#e9e4a8"; ctx.fillRect(px + 4, py + 4, pw - 8, 3);
+    ctx.fillStyle = "#cbb968"; ctx.fillRect(px + 4, py + ph - 7, pw - 8, 3);
+    ctx.font = '900 12px "Trebuchet MS", sans-serif'; ctx.textAlign = "center"; ctx.textBaseline = "top";
+    ctx.fillStyle = "#e86101";
+    ctx.fillText("MEDAL", px + 46, py + 12);
+    ctx.textAlign = "right";
+    ctx.fillText("SCORE", px + pw - 14, py + 12);
+    ctx.fillText("BEST", px + pw - 14, py + 60);
+    // count the score up like the original
+    const shown = k < 1 ? 0 : Math.min(score, Math.floor((t - 0.65) * 30));
+    drawNumber(Math.max(0, shown), px + pw - 14, py + 28, 3, "right");
+    drawNumber(best, px + pw - 14, py + 76, 3, "right");
+    if (newBest && shown >= score) {
+      ctx.fillStyle = "#e8132b"; ctx.fillRect(px + pw - 98, py + 78, 30, 14);
+      ctx.fillStyle = "#fff"; ctx.font = '900 10px "Trebuchet MS", sans-serif'; ctx.textAlign = "center";
+      ctx.fillText("NEW", px + pw - 83, py + 80);
+    }
+    // medal slot
+    const mx = px + 46, my = py + 66;
+    ctx.fillStyle = "#cbb968"; ctx.beginPath(); ctx.arc(mx, my, 23, 0, Math.PI * 2); ctx.fill();
+    const m = medal(score);
+    if (m && shown >= score) {
+      ctx.fillStyle = m.d; ctx.beginPath(); ctx.arc(mx, my, 22, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = m.c; ctx.beginPath(); ctx.arc(mx, my, 19, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = m.d; ctx.font = '900 18px "Trebuchet MS", sans-serif'; ctx.textBaseline = "middle"; ctx.fillText("★", mx, my + 1);
+      // sparkle
+      const s = Math.floor(t * 4) % 4, sa = s * 1.6;
+      ctx.fillStyle = "#fff";
+      const sx = mx + Math.cos(sa) * 13, sy = my + Math.sin(sa) * 13;
+      ctx.fillRect(sx - 3, sy, 7, 1); ctx.fillRect(sx, sy - 3, 1, 7);
+      ctx.font = '900 9px "Trebuchet MS", sans-serif'; ctx.fillStyle = "#e86101"; ctx.textBaseline = "top";
+      ctx.fillText(m.n, mx, my + 26);
+    }
+    if (t > 0.9) {
+      const blink = Math.floor(t * 2) % 2 === 0;
+      if (blink) {
+        ctx.font = '900 15px "Trebuchet MS", sans-serif'; ctx.textAlign = "center"; ctx.textBaseline = "top";
+        ctx.strokeStyle = "#543847"; ctx.lineWidth = 4; ctx.strokeText("TAP TO PLAY AGAIN", W / 2, py + ph + 20);
+        ctx.fillStyle = "#fff"; ctx.fillText("TAP TO PLAY AGAIN", W / 2, py + ph + 20);
+      }
+    }
+  }
+
+  function draw() {
+    const bg = night ? bgNight : bgDay;
+    const bx = -Math.round(bgX);
+    ctx.drawImage(bg, bx, 0); ctx.drawImage(bg, bx + W, 0);
+    for (const p of pipes) drawPipe(Math.round(p.x), p.top);
+    drawGround();
+    drawBird();
+    if (state === "play" || state === "dying") drawNumber(score, W / 2, Math.round(H * 0.08), 4);
+    if (state === "ready") drawReady();
+    if (state === "over") drawOver();
+    if (flash > 0) { ctx.fillStyle = `rgba(255,255,255,${flash})`; ctx.fillRect(0, 0, W, H); }
+  }
+
+  // ---------- loop: fixed 60 Hz simulation ----------
+  let last = performance.now(), acc = 0;
+  function frame(now) {
+    acc += Math.min(0.1, (now - last) / 1000);
+    last = now;
+    while (acc >= 1 / 60) { step(); acc -= 1 / 60; }
+    draw();
+    homeLink.style.display = state === "ready" || state === "over" ? "" : "none";
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- input ----------
+  window.addEventListener("pointerdown", e => { if (e.target.closest("a")) return; e.preventDefault(); flap(); }, { passive: false });
+  window.addEventListener("keydown", e => {
+    if (e.repeat) return;
+    if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW" || e.code === "Enter") { e.preventDefault(); flap(); }
+  });
+  window.addEventListener("resize", () => { resize(); if (state === "ready") reset(); });
+
+  resize();
+  reset();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

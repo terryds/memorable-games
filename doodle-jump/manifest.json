@@ -1,0 +1,17 @@
+{
+  "name": "Doodle Jump",
+  "short_name": "Doodle Jump",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f1e1",
+  "theme_color": "#f7f1e1",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "scope": "./"
+}

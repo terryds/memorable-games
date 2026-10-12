@@ -1,0 +1,16 @@
+{
+  "name": "Guitar Hero (web)",
+  "short_name": "Guitar Hero",
+  "start_url": "./",
+  "display": "fullscreen",
+  "background_color": "#0b0614",
+  "theme_color": "#0b0614",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "scope": "./"
+}

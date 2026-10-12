@@ -1,0 +1,17 @@
+{
+  "name": "Flappy Bird",
+  "short_name": "Flappy",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#4ec0ca",
+  "theme_color": "#4ec0ca",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "scope": "./"
+}

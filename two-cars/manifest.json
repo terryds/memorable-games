@@ -1,0 +1,17 @@
+{
+  "name": "Two Cars",
+  "short_name": "Two Cars",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#232a63",
+  "theme_color": "#232a63",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "scope": "./"
+}
