@@ -1,0 +1,12 @@
+// Cloudflare Workers config: serves this repo as a static site (no build step).
+// Deploy: `npx wrangler deploy` · Local preview: `npx wrangler dev`
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "memorable-mobile-games",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./public",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

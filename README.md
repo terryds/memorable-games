@@ -26,58 +26,61 @@ Live at **https://games.terrydjony.com**
 
 ```
 .
-├── index.html          # landing page
-├── assets/
-│   ├── icon.svg        # site favicon
-│   ├── og.png          # social share image (1200×630)
-│   └── shots/*.jpg     # game thumbnails used on the landing page
-├── two-cars/           # each game: index.html + manifest.json + icon.svg
-├── doodle-jump/
-├── fruit-ninja/
-├── flappy-bird/
-├── guitar-hero/
-├── 2048/
-└── CNAME               # custom domain for GitHub Pages
+├── wrangler.jsonc        # Cloudflare Workers config (serves ./public as static assets)
+└── public/               # everything that gets deployed
+    ├── index.html        # landing page
+    ├── 404.html          # "Game over" not-found page
+    ├── assets/
+    │   ├── icon.svg      # site favicon
+    │   ├── og.png        # social share image (1200×630)
+    │   └── shots/*.jpg   # game thumbnails used on the landing page
+    ├── fruit-ninja/      # each game: index.html + manifest.json + icon.svg
+    ├── two-cars/
+    ├── doodle-jump/
+    ├── flappy-bird/
+    ├── guitar-hero/
+    └── 2048/
 ```
 
-All paths are relative, so the site works from any host or sub-path.
+All paths inside `public/` are relative, so the site works from any host or sub-path.
 
 ## Run locally
 
-Any static file server works:
+Any static file server pointed at `public/` works:
 
 ```bash
-npx serve .            # or
-python3 -m http.server 8080
+npx serve public          # or: python3 -m http.server 8080 -d public
+npx wrangler dev          # same as production, via Cloudflare's local runtime (Node 22+)
 ```
 
-Then open http://localhost:8080 (use your computer's LAN IP to test on a phone).
+## Deploy (Cloudflare Workers) → games.terrydjony.com
 
-## Deploy to games.terrydjony.com
+Connect the repo in **Cloudflare dashboard → Workers & Pages → Create → Import a repository**:
 
-It's a plain static site — point any static host at the repo root, no build command,
-output directory `/`.
+| Field | Value |
+|-------|-------|
+| Project name | `memorable-mobile-games` (must match `name` in `wrangler.jsonc`) |
+| Build command | *(leave empty)* |
+| Deploy command | `npx wrangler deploy` |
+| Preview command | `npx wrangler preview` (or leave the default) |
 
-**Cloudflare Pages / Netlify / Vercel**
-1. Import the repo, framework preset "None", build command empty, output dir `/` (or `.`).
-2. Add the custom domain `games.terrydjony.com` in the project settings.
-3. At your DNS provider add a `CNAME` record: `games` → the target the host gives you
-   (e.g. `<project>.pages.dev`, `<site>.netlify.app`, or `cname.vercel-dns.com`).
+Every push to `main` redeploys. Then add the domain: **Worker → Settings → Domains & Routes →
+Add → Custom domain → `games.terrydjony.com`** (works automatically when `terrydjony.com` uses
+Cloudflare DNS).
 
-**GitHub Pages**
-1. Settings → Pages → Deploy from branch → `main` / root.
-2. The `CNAME` file already sets `games.terrydjony.com`.
-3. DNS: `CNAME` record `games` → `<github-user>.github.io`. Enable "Enforce HTTPS".
+`wrangler.jsonc` serves `public/` as static assets: `/two-cars` redirects to `/two-cars/`,
+and unknown paths get `404.html`. Nothing outside `public/` (README, config, `.git`) is ever
+uploaded.
 
-The social preview (`og:image`, canonical URL) in `index.html` points at
-`https://games.terrydjony.com/` — update those two URLs if you deploy elsewhere.
+The social preview (`og:image`, canonical URL) in `public/index.html` points at
+`https://games.terrydjony.com/` — update those URLs if you deploy elsewhere.
 
 ## Adding a game
 
-1. Create `<slug>/index.html` (+ `manifest.json` with `"start_url": "./"`, `icon.svg`).
+1. Create `public/<slug>/index.html` (+ `manifest.json` with `"start_url": "./"`, `icon.svg`).
 2. Add the `← All games` link (`<a class="homeLink" href="../">`) on its menu screens.
 3. Add an entry to the `GAMES` array in the landing page and a thumbnail at
-   `assets/shots/<slug>.jpg` (390×780 @1.5x screenshot works well).
+   `public/assets/shots/<slug>.jpg` (390×780 @1.5x screenshot works well).
 
 ## Disclaimer
 
