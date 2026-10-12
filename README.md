@@ -6,9 +6,9 @@ Live at **https://games.terrydjony.com**
 | # | Game | Path | Controls |
 |---|------|------|----------|
 | 1 | 🍉 Fruit Ninja | `/fruit-ninja/` | Swipe to slice (mouse drag) |
-| 2 | 🚗 Two Cars | `/two-cars/` | Tap left / right half (keyboard ← →) |
+| 2 | 🐦 Flappy Bird | `/flappy-bird/` | Tap to flap (Space / click) |
 | 3 | 🟢 Doodle Jump | `/doodle-jump/` | Tilt your phone (default) or hold left / right, tap to shoot (keyboard ← → / Space) |
-| 4 | 🐦 Flappy Bird | `/flappy-bird/` | Tap to flap (Space / click) |
+| 4 | 🚗 Two Cars | `/two-cars/` | Tap left / right half (keyboard ← →) |
 | 5 | 🎸 Guitar Hero | `/guitar-hero/` | Tap the frets (keyboard A S D F G, Space = Star Power) |
 | 6 | 🔢 2048 | `/2048/` | Swipe to slide tiles (arrow keys / WASD, U = undo) |
 
