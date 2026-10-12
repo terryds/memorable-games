@@ -10,6 +10,7 @@ Live at **https://games.terrydjony.com**
 | 3 | 🍉 Fruit Ninja | `/fruit-ninja/` | Swipe to slice (mouse drag) |
 | 4 | 🐦 Flappy Bird | `/flappy-bird/` | Tap to flap (Space / click) |
 | 5 | 🎸 Guitar Hero | `/guitar-hero/` | Tap the frets (keyboard A S D F G, Space = Star Power) |
+| 6 | 🔢 2048 | `/2048/` | Swipe to slide tiles (arrow keys / WASD, U = undo) |
 
 ## How it's built
 
@@ -21,7 +22,7 @@ Live at **https://games.terrydjony.com**
 - **Mobile-first**: touch controls, safe-area insets, no zoom/scroll bounce, and each game
   can be installed to the home screen (opens full-screen).
 - **High scores** live in `localStorage` (per-game key prefixes: `twocars.`, `dj.`, `fn.`,
-  `flappy.`, `gh.`), so the landing page can show your personal bests.
+  `flappy.`, `gh.`, `g2048.`), so the landing page can show your personal bests.
 
 ```
 .
@@ -35,6 +36,7 @@ Live at **https://games.terrydjony.com**
 ├── fruit-ninja/
 ├── flappy-bird/
 ├── guitar-hero/
+├── 2048/
 └── CNAME               # custom domain for GitHub Pages
 ```
 
