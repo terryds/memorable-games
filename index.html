@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Memorable Mobile Games — the classics, right in your browser</title>
-<meta name="description" content="Two Cars, Doodle Jump, Fruit Ninja, Flappy Bird, Guitar Hero and 2048 — the mobile games you remember, rebuilt for the browser. Free, no install, no ads.">
+<meta name="description" content="Fruit Ninja, Two Cars, Doodle Jump, Flappy Bird, Guitar Hero and 2048 — the mobile games you remember, rebuilt for the browser. Free, no install, no ads.">
 <meta name="theme-color" content="#120a24">
 <link rel="icon" href="assets/icon.svg">
 <link rel="apple-touch-icon" href="assets/icon.svg">
@@ -189,15 +189,15 @@
 
 <script>
   const GAMES = [
+    { slug: "fruit-ninja", name: "Fruit Ninja", year: "2010", genre: "Swipe", c1: "#b5562a", c2: "#5e2610",
+      desc: "Swipe to slice flying fruit into juicy halves. Chain combos, and whatever you do — don't hit the bomb.",
+      how: ["✋ Swipe to slice", "🍉 Combos", "💣 Avoid bombs"], best: () => Math.max(+localStorage.getItem("fn.best.classic") || 0, +localStorage.getItem("fn.best.zen") || 0) },
     { slug: "two-cars", name: "Two Cars", year: "2014", genre: "Reflex", c1: "#3b4ba8", c2: "#1d2563",
       desc: "Steer two cars at once — one with each thumb. Catch every circle, dodge every square. Your brain will melt.",
       how: ["👆 Tap left / right", "⭕ Collect", "⬛ Dodge"], best: () => +localStorage.getItem("twocars.best") || 0 },
     { slug: "doodle-jump", name: "Doodle Jump", year: "2009", genre: "Endless climber", c1: "#8fae3a", c2: "#4c6b16",
       desc: "Bounce up a notebook page forever. Springs, propeller hats, breaking platforms and monsters to stomp or shoot.",
       how: ["👈👉 Hold or tilt", "💥 Shoot", "🌀 Springs"], best: () => +localStorage.getItem("dj.best") || 0 },
-    { slug: "fruit-ninja", name: "Fruit Ninja", year: "2010", genre: "Swipe", c1: "#b5562a", c2: "#5e2610",
-      desc: "Swipe to slice flying fruit into juicy halves. Chain combos, and whatever you do — don't hit the bomb.",
-      how: ["✋ Swipe to slice", "🍉 Combos", "💣 Avoid bombs"], best: () => Math.max(+localStorage.getItem("fn.best.classic") || 0, +localStorage.getItem("fn.best.zen") || 0) },
     { slug: "flappy-bird", name: "Flappy Bird", year: "2013", genre: "One-tap", c1: "#2aa6b3", c2: "#0e5a63",
       desc: "Tap to flap through the pipes. Pixel-perfect, rage-inducing, impossible to put down. Go for platinum.",
       how: ["👆 Tap to flap", "🥇 Medals", "🌙 Day & night"], best: () => +localStorage.getItem("flappy.best") || 0 },

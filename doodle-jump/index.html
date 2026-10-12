@@ -176,14 +176,20 @@
 
   // ---------- controls mode ----------
   const hasTilt = "DeviceOrientationEvent" in window && matchMedia("(pointer: coarse)").matches;
-  let ctrl = localStorage.getItem("dj.ctrl") || "touch"; // touch | tilt
+  let ctrl = localStorage.getItem("dj.ctrl") || "tilt"; // tilt (default on phones) | touch
   if (!hasTilt) ctrl = "touch";
-  let tiltGamma = 0;
-  window.addEventListener("deviceorientation", e => { if (e.gamma != null) tiltGamma = e.gamma; });
+  let tiltGamma = 0, tiltSeen = false;
+  window.addEventListener("deviceorientation", e => { if (e.gamma != null) { tiltGamma = e.gamma; tiltSeen = true; } });
+  // fall back to touch controls if tilt isn't allowed or the phone has no motion sensor
+  function useTouchControls() {
+    ctrl = "touch"; syncCtrl();
+    if (state === "play" && matchMedia("(pointer: coarse)").matches) $("shootBtn").style.display = "block";
+  }
   async function askTilt() {
     const D = window.DeviceOrientationEvent;
     if (D && typeof D.requestPermission === "function") {
-      try { return (await D.requestPermission()) === "granted"; } catch { return false; }
+      // only an explicit "denied" turns tilt off; anything else is settled by whether sensor data arrives
+      try { return (await D.requestPermission()) !== "denied"; } catch { return true; }
     }
     return true;
   }
@@ -642,7 +648,7 @@
   const show = (el, on) => $(el).classList.toggle("hidden", !on);
 
   async function start() {
-    if (ctrl === "tilt") await askTilt();
+    if (ctrl === "tilt" && !(await askTilt())) useTouchControls();
     if (actx && actx.state === "suspended") actx.resume();
     reset();
     deathReason = "";
@@ -651,6 +657,7 @@
     $("hud").style.display = "block"; $("pauseBtn").style.display = "block";
     $("shootBtn").style.display = ctrl === "touch" && matchMedia("(pointer: coarse)").matches ? "block" : "none";
     last = performance.now();
+    if (ctrl === "tilt") setTimeout(() => { if (ctrl === "tilt" && !tiltSeen) useTouchControls(); }, 1500);
   }
 
   function showOver() {
