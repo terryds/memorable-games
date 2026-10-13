@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Carbon Nights — Street Racing</title>
+<link rel="icon" href="icon.svg" />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#04040a" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="loading">
+  <div class="logo"><span>CARBON</span><b>NIGHTS</b></div>
+  <div class="bar"><i id="loadbar"></i></div>
+  <div id="loadtext">Starting engine…</div>
+</div>
+
+<div id="menu" class="hidden">
+  <a class="homeLink" href="../">← All games</a>
+  <div class="menu-left">
+    <div class="logo"><span>CARBON</span><b>NIGHTS</b></div>
+    <div class="tag">Own the city. Rule the canyon.</div>
+
+    <h3>Event</h3>
+    <div class="cards" id="modes">
+      <button class="card mode sel" data-mode="race"><b>Circuit Race</b><small>2 laps · 3 crew rivals · city → canyon → bay</small></button>
+      <button class="card mode" data-mode="drift"><b>Drift Attack</b><small>2 laps · chain slides for points</small></button>
+      <button class="card mode" data-mode="free"><b>Free Roam</b><small>Cruise the night. No timer.</small></button>
+    </div>
+
+    <h3>Car Class</h3>
+    <div class="cards" id="classes"></div>
+
+    <h3>Paint</h3>
+    <div id="swatches"></div>
+
+    <div class="settings">
+      <button id="optQuality" class="pill">Graphics: HIGH</button>
+      <button id="optRain" class="pill">Rain: ON</button>
+      <button id="optMusic" class="pill">Music: ON</button>
+    </div>
+
+    <button id="go" class="go">START <kbd>ENTER</kbd></button>
+  </div>
+  <div id="padbox">
+    <div class="padhead">🎮 Controller supported</div>
+    <div class="padrec">Recommended for the best experience — analog steering and triggers make drifting much smoother.</div>
+    <div id="padstatus">No controller detected — plug one in and press any button.</div>
+    <div class="padmap">
+      <span><b>Left stick</b> Steer</span>
+      <span><b>RT / R2</b> Gas</span>
+      <span><b>LT / L2</b> Brake / Reverse</span>
+      <span><b>A / ✕</b> Handbrake / Drift</span>
+      <span><b>B / ○</b> Nitro</span>
+      <span><b>Y / △</b> Speedbreaker</span>
+      <span><b>RB / R1</b> Camera</span>
+      <span><b>View / Share</b> Reset car</span>
+      <span><b>Menu / Options</b> Pause</span>
+      <span><b>A / ✕</b> or <b>Menu</b> Start race</span>
+    </div>
+  </div>
+  <div class="menu-right">
+    <div id="carname"></div>
+    <div id="carblurb"></div>
+  </div>
+  <div class="controls">
+    <span><kbd>W</kbd><kbd>↑</kbd> Gas</span>
+    <span><kbd>S</kbd><kbd>↓</kbd> Brake/Reverse</span>
+    <span><kbd>A</kbd><kbd>D</kbd> Steer</span>
+    <span><kbd>SPACE</kbd> Handbrake / Drift</span>
+    <span><kbd>SHIFT</kbd> Nitro</span>
+    <span><kbd>Q</kbd> Speedbreaker</span>
+    <span><kbd>C</kbd> Camera</span>
+    <span><kbd>R</kbd> Reset car</span>
+    <span><kbd>ESC</kbd> Pause</span>
+  </div>
+</div>
+
+<div id="hud" class="hidden">
+  <div id="tl">
+    <div id="posbox"><span id="pos">4</span><span id="posof">/4</span></div>
+    <div id="lapbox">LAP <b id="lap">1/2</b></div>
+    <div id="timebox"><span id="time">0:00.00</span><small id="best"></small></div>
+    <div id="standings"></div>
+    <div id="driftbox" class="hidden"><small>DRIFT SCORE</small><b id="driftscore">0</b></div>
+  </div>
+  <canvas id="minimap" width="440" height="440"></canvas>
+  <canvas id="speedo" width="520" height="520"></canvas>
+  <canvas id="nos" width="240" height="340"></canvas>
+  <div id="msg"></div>
+  <div id="count"></div>
+  <div id="chain"></div>
+  <div id="hint">ESC — menu</div>
+</div>
+
+<div id="pause" class="overlay hidden">
+  <h2>PAUSED</h2>
+  <button data-act="resume">Resume</button>
+  <button data-act="restart">Restart Event</button>
+  <button data-act="menu">Quit to Menu</button>
+</div>
+
+<div id="results" class="overlay hidden">
+  <h2 id="restitle">RACE COMPLETE</h2>
+  <div id="resbody"></div>
+  <div class="row">
+    <button data-act="restart">Race Again <kbd>ENTER</kbd></button>
+    <button data-act="menu">Menu <kbd>ESC</kbd></button>
+  </div>
+</div>
+
+<div id="flash"></div>
+<script type="module" src="dist/main.js"></script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 # Memorable Mobile Games
 
-The mobile classics you remember — rebuilt from scratch to play instantly in the browser.
+The mobile classics you remember — rebuilt from scratch to play instantly in the browser —
+plus a 3D street racer for the big screen.
 Live at **https://games.terrydjony.com**
 
 | # | Game | Path | Controls |
@@ -12,6 +13,16 @@ Live at **https://games.terrydjony.com**
 | 5 | 🎸 Guitar Hero | `/guitar-hero/` | Tap the frets (keyboard A S D F G, Space = Star Power) |
 | 6 | 🔢 2048 | `/2048/` | Swipe to slide tiles (arrow keys / WASD, U = undo) |
 
+### Desktop
+
+| # | Game | Path | Controls |
+|---|------|------|----------|
+| 7 | 🏎️ Carbon Nights | `/carbon-nights/` | Game controller recommended (RT gas, LT brake, A drift, B nitro). Keyboard: W/S, A/D, Space = handbrake, Shift = nitro, Q = Speedbreaker, C = camera, R = reset |
+
+Carbon Nights is a Three.js street racer inspired by a 2006 night-racing classic: a wet neon
+downtown, a canyon road with a view over the city, and a waterfront run past a lit suspension
+bridge. Circuit Race (vs 3 AI rivals), Drift Attack and Free Roam; Tuner / Muscle / Exotic cars.
+
 ## How it's built
 
 - **Zero dependencies, zero build step.** Every game is one self-contained `index.html`
@@ -22,11 +33,16 @@ Live at **https://games.terrydjony.com**
 - **Mobile-first**: touch controls, safe-area insets, no zoom/scroll bounce, and each game
   can be installed to the home screen (opens full-screen).
 - **High scores** live in `localStorage` (per-game key prefixes: `twocars.`, `dj.`, `fn.`,
-  `flappy.`, `gh.`, `g2048.`), so the landing page can show your personal bests.
+  `flappy.`, `gh.`, `g2048.`, `cn-`), so the landing page can show your personal bests.
+- **The desktop game is the one exception to "no build step"**: Carbon Nights uses Three.js, so its
+  source lives in `desktop/carbon-nights/` and is bundled with Bun into
+  `public/carbon-nights/dist/main.js`. The bundle is committed, so deploying still needs no build.
 
 ```
 .
 ├── wrangler.jsonc        # Cloudflare Workers config (serves ./public as static assets)
+├── desktop/
+│   └── carbon-nights/    # Three.js source for the desktop racer (src/, test/ physics sims)
 └── public/               # everything that gets deployed
     ├── index.html        # landing page
     ├── 404.html          # "Game over" not-found page
@@ -39,7 +55,8 @@ Live at **https://games.terrydjony.com**
     ├── doodle-jump/
     ├── flappy-bird/
     ├── guitar-hero/
-    └── 2048/
+    ├── 2048/
+    └── carbon-nights/    # index.html, style.css, manifest, icon + dist/main.js (built bundle)
 ```
 
 All paths inside `public/` are relative, so the site works from any host or sub-path.
@@ -51,6 +68,17 @@ Any static file server pointed at `public/` works:
 ```bash
 npx serve public          # or: python3 -m http.server 8080 -d public
 npx wrangler dev          # same as production, via Cloudflare's local runtime (Node 22+)
+```
+
+### Rebuilding Carbon Nights
+
+After editing anything in `desktop/carbon-nights/src/`:
+
+```bash
+cd desktop/carbon-nights
+bun install
+bun run build             # writes ../../public/carbon-nights/dist/main.js — commit it
+bun run sim               # optional: headless AI race to sanity-check physics
 ```
 
 ## Deploy (Cloudflare Workers) → games.terrydjony.com
@@ -81,6 +109,7 @@ The social preview (`og:image`, canonical URL) in `public/index.html` points at
 2. Add the `← All games` link (`<a class="homeLink" href="../">`) on its menu screens.
 3. Add an entry to the `GAMES` array in the landing page and a thumbnail at
    `public/assets/shots/<slug>.jpg` (390×780 @1.5x screenshot works well).
+   Desktop games go in the "On the big screen" section instead, with a 16:9 thumbnail.
 
 ## Disclaimer
 

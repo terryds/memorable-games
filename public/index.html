@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Memorable Mobile Games — the classics, right in your browser</title>
-<meta name="description" content="Fruit Ninja, Flappy Bird, Doodle Jump, Two Cars, Guitar Hero and 2048 — the mobile games you remember, rebuilt for the browser. Free, no install, no ads.">
+<meta name="description" content="Fruit Ninja, Flappy Bird, Doodle Jump, Two Cars, Guitar Hero and 2048 — the mobile games you remember, rebuilt for the browser — plus Carbon Nights, a 3D street racer for desktop. Free, no install, no ads.">
 <meta name="theme-color" content="#120a24">
 <link rel="icon" href="assets/icon.svg">
 <link rel="apple-touch-icon" href="assets/icon.svg">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://games.terrydjony.com/">
 <meta property="og:title" content="Memorable Mobile Games">
-<meta property="og:description" content="The mobile classics you remember — rebuilt for your browser. Free, no install, no ads.">
+<meta property="og:description" content="The mobile classics you remember, plus a 3D street racer for desktop — rebuilt for your browser. Free, no install, no ads.">
 <meta property="og:image" content="https://games.terrydjony.com/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -111,6 +111,30 @@
   }
   .best { position: absolute; top: 14px; right: 14px; font-size: 12px; font-weight: 800; padding: 4px 9px; border-radius: 999px; background: #0006; display: none; }
 
+  /* ---------- desktop ---------- */
+  .dcard {
+    position: relative; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 28px; align-items: center;
+    padding: 22px; border-radius: 28px; text-decoration: none; overflow: hidden; isolation: isolate;
+    background: linear-gradient(135deg, #0b1230, #2a0b3a 60%, #3a1020); border: 1px solid #ffffff22; transition: transform .18s, box-shadow .18s;
+  }
+  .dcard::before { content: ""; position: absolute; inset: 0; z-index: -1;
+    background: radial-gradient(60% 80% at 0% 0%, #00e5ff33, transparent 60%), radial-gradient(50% 70% at 100% 100%, #ff7a1a33, transparent 60%); }
+  .dcard:hover { transform: translateY(-4px); box-shadow: 0 18px 40px #0008, 0 0 0 2px #00e5ff55; }
+  .monitor { position: relative; padding: 8px 8px 0; border-radius: 16px 16px 6px 6px; background: #05060c; box-shadow: 0 16px 34px #000a, inset 0 0 0 2px #ffffff1c; }
+  .monitor img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 9px; background: #000; }
+  .monitor::after { content: ""; display: block; height: 18px; margin: 0 30%; background: linear-gradient(#1a1c26, #0b0c12); clip-path: polygon(14% 0, 86% 0, 100% 100%, 0 100%); transform: translateY(8px); }
+  .dcard .info { padding: 0; }
+  .dcard h3 { margin: 6px 0 6px; font-size: clamp(30px, 4vw, 44px); letter-spacing: -1px; line-height: 1; font-style: italic;
+    background: linear-gradient(90deg, #fff, #9ff3ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .dcard p { margin: 0 0 12px; font-size: 16px; line-height: 1.5; opacity: .95; }
+  .dcard .how span { background: #ffffff14; }
+  .dcard .how span.rec { background: linear-gradient(90deg, #ff7a1a, #ffb000); color: #1d0c00; }
+  .dcard .play { background: linear-gradient(180deg, #ffe066, #ffb300); }
+  .note { margin-top: 12px; font-size: 13px; color: var(--muted); }
+  .phone-only { display: none; }
+  @media (max-width: 760px) { .dcard { grid-template-columns: 1fr; gap: 18px; padding: 16px; } }
+  @media (hover: none) and (pointer: coarse) { .phone-only { display: block; } }
+
   /* ---------- install ---------- */
   .install { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
   .step { padding: 22px; border-radius: 22px; background: var(--bg2); border: 1px solid var(--line); }
@@ -138,17 +162,18 @@
   <div class="floaters" aria-hidden="true">
     <span style="left:6%;top:22%">🚗</span><span style="left:88%;top:18%;animation-delay:-1s">🍉</span>
     <span style="left:12%;top:68%;animation-delay:-2s">🐦</span><span style="left:84%;top:62%;animation-delay:-3s">🎸</span>
-    <span style="left:50%;top:6%;animation-delay:-1.5s;font-size:26px">⭐</span><span style="left:72%;top:84%;animation-delay:-2.5s;font-size:28px">🔢</span>
+    <span style="left:50%;top:6%;animation-delay:-1.5s;font-size:26px">⭐</span><span style="left:72%;top:84%;animation-delay:-2.5s;font-size:28px">🔢</span><span style="left:26%;top:86%;animation-delay:-3.5s;font-size:30px">🏎️</span>
   </div>
   <div class="wrap hero">
-    <span class="badge">🕹️ 6 games · free · no install</span>
+    <span class="badge">🕹️ 6 mobile games + 1 desktop racer · free · no install</span>
     <h1>Memorable<br><span class="grad">Mobile Games</span></h1>
-    <p class="tagline">The mobile classics you remember from the good old days — rebuilt from scratch to play instantly in your browser. No app store. No ads. Just tap and play.</p>
+    <p class="tagline">The mobile classics you remember from the good old days — rebuilt from scratch to play instantly in your browser. Now with a 3D street racer for the big screen. No app store. No ads. Just tap and play.</p>
     <div class="cta">
       <a class="btn" href="#games">▶ Pick a game</a>
+      <a class="btn ghost" href="#desktop">🏎️ Desktop racer</a>
       <a class="btn ghost" href="#install">📲 Add to home screen</a>
     </div>
-    <div class="stats"><div><b>6</b>classics</div><div><b>0</b>downloads</div><div><b>∞</b>retries</div></div>
+    <div class="stats"><div><b>7</b>games</div><div><b>0</b>downloads</div><div><b>∞</b>retries</div></div>
   </div>
 </header>
 
@@ -163,13 +188,35 @@
     </div>
   </section>
 
+  <section id="desktop" style="padding-top:12px">
+    <div class="wrap">
+      <div class="section-title">
+        <h2>On the big screen</h2>
+        <p>Desktop games — grab a controller, turn the sound up.</p>
+      </div>
+      <a class="dcard" href="carbon-nights/">
+        <span class="best" id="cnBest"></span>
+        <div class="monitor"><img src="assets/shots/carbon-nights.jpg" alt="Carbon Nights screenshot" loading="lazy" width="1280" height="720"></div>
+        <div class="info">
+          <span class="num">NO. 07 · DESKTOP</span>
+          <h3>Carbon Nights</h3>
+          <span class="meta">3D street racing · inspired by a 2006 classic</span>
+          <p>Race a rain-soaked neon city at night, climb a canyon road with the skyline below, and blast down to the bay. Three crew rivals, drifting, nitro and Speedbreaker slow-mo.</p>
+          <div class="how"><span class="rec">🎮 Controller recommended</span><span>⌨️ Keyboard works</span><span>🏁 Race · Drift · Free roam</span><span>🚗 Tuner · Muscle · Exotic</span></div>
+          <span class="play">▶ Play on desktop</span>
+          <div class="note phone-only">📵 Needs a computer with a keyboard or game controller.</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
   <section id="install" style="padding-top:12px">
     <div class="wrap">
       <div class="section-title"><h2>Play it like an app</h2><p>Each game installs to your home screen and opens full-screen.</p></div>
       <div class="install">
         <div class="step"><div class="ico">📱</div><h4>iPhone / iPad (Safari)</h4><ol><li>Open a game</li><li>Tap the <b>Share</b> button</li><li>Choose <b>Add to Home Screen</b></li></ol></div>
         <div class="step"><div class="ico">🤖</div><h4>Android (Chrome)</h4><ol><li>Open a game</li><li>Tap the <b>⋮</b> menu</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b></li></ol></div>
-        <div class="step"><div class="ico">💻</div><h4>Desktop</h4><ol><li>Just click and play</li><li>Keyboard controls are listed in each game</li><li>Turn the sound on for Guitar Hero 🎸</li></ol></div>
+        <div class="step"><div class="ico">💻</div><h4>Desktop</h4><ol><li>Just click and play</li><li>Keyboard controls are listed in each game</li><li>Turn the sound on for Guitar Hero 🎸</li><li>Plug in a controller for Carbon Nights 🏎️</li></ol></div>
       </div>
       <div class="why">
         <div>⚡<b>Instant</b><span>Every game is a single tiny page. It loads in a blink, even on slow data.</span></div>
@@ -224,6 +271,8 @@
         <span class="play">▶ Play</span>
       </div>
     </a>`).join("");
+  const cnBest = +localStorage.getItem("cn-drift-best") || 0;
+  if (cnBest > 0) { const el = document.getElementById("cnBest"); el.textContent = "🏆 Best drift: " + cnBest.toLocaleString(); el.style.display = "block"; el.style.zIndex = 2; }
   GAMES.forEach((g, i) => {
     const b = g.best();
     if (b > 0) { const el = document.querySelector(`[data-best="${i}"]`); el.textContent = "🏆 Your best: " + b.toLocaleString(); el.style.display = "block"; }
