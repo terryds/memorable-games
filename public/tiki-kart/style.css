@@ -1,0 +1,103 @@
+:root { --sun: #ffd23f; --orange: #ff8a1f; --pink: #ff4f9a; --sea: #1ea7e1; --leaf: #3fbf3f; --ink: #fff; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #1ea7e1; color: var(--ink); font-family: 'Fredoka', system-ui, sans-serif; user-select: none; }
+canvas { display: block; }
+.hidden { display: none !important; }
+button { font-family: inherit; color: inherit; cursor: pointer; }
+kbd { font: 700 11px 'Fredoka'; padding: 2px 6px; border-radius: 6px; background: #fff3; border: 1px solid #fff6; margin: 0 2px; }
+.stroke { -webkit-text-stroke: 0; text-shadow: 0 3px 0 #0005, 0 0 0 #000; }
+
+.logo { font: 800 86px/0.85 'Baloo 2', sans-serif; color: var(--sun); letter-spacing: 1px; transform: rotate(-3deg);
+  text-shadow: 0 5px 0 #c4561a, 0 9px 0 #7a2b00, 0 14px 22px #0006; }
+.logo b { display: block; font-size: 46px; color: #fff; text-shadow: 0 4px 0 #e8322b, 0 7px 0 #7a1d12, 0 10px 18px #0006; }
+
+#loading { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px;
+  background: radial-gradient(ellipse at 50% 120%, #ffd23f 0%, #ff8a1f 30%, #1ea7e1 70%); }
+#loading .bar { width: 360px; height: 14px; border-radius: 99px; background: #0003; overflow: hidden; border: 3px solid #fff; }
+#loading .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--leaf), var(--sun)); transition: width .2s; }
+#loadtext { font-weight: 600; font-size: 18px; text-shadow: 0 2px 0 #0004; }
+
+#menu { position: fixed; inset: 0; z-index: 10; background: linear-gradient(90deg, #0b3b5fcc 0%, #0b3b5f88 34%, transparent 58%); }
+.homeLink { position: absolute; left: 48px; top: 14px; z-index: 2; padding: 6px 14px; border-radius: 99px; font: 700 13px 'Fredoka'; color: #fff; text-decoration: none; background: #0005; border: 2px solid #fff5; }
+.homeLink:hover { background: #0008; }
+.menu-left { position: absolute; left: 48px; top: 58px; width: 560px; }
+.tag { margin: 22px 0 6px; font-weight: 600; font-size: 17px; color: #fff; text-shadow: 0 2px 0 #0005; }
+#menu h3 { margin: 18px 0 8px; font: 800 18px 'Baloo 2'; letter-spacing: 1px; text-transform: uppercase; color: var(--sun); text-shadow: 0 2px 0 #0006; }
+#chars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.char { position: relative; padding: 10px 12px; border-radius: 18px; border: 3px solid #fff4; background: #0006; text-align: left; transition: transform .12s; }
+.char:hover { transform: translateY(-2px); }
+.char.sel { border-color: #fff; background: linear-gradient(160deg, var(--c), #0007); box-shadow: 0 0 0 3px var(--sun), 0 8px 18px #0006; }
+.char .em { font-size: 34px; line-height: 1; }
+.char b { display: block; font: 800 20px 'Baloo 2'; margin-top: 2px; }
+.char small { display: block; font-size: 12px; opacity: .85; font-weight: 600; }
+.stat { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; letter-spacing: .5px; margin-top: 2px; }
+.stat em { font-style: normal; width: 44px; opacity: .8; }
+.stat i { flex: 1; height: 5px; border-radius: 9px; background: #fff3; position: relative; overflow: hidden; }
+.stat i::after { content: ''; position: absolute; inset: 0; width: var(--v); background: var(--sun); border-radius: 9px; }
+.row { display: flex; gap: 8px; }
+.pill { padding: 8px 18px; border-radius: 99px; border: 3px solid #fff5; background: #0006; font: 700 16px 'Fredoka'; }
+.pill.small { font-size: 13px; padding: 6px 14px; }
+.pill.sel { background: var(--sun); color: #5a2a00; border-color: #fff; }
+.go { margin-top: 18px; padding: 12px 44px; border: 0; border-radius: 22px; font: 800 30px 'Baloo 2'; color: #5a2a00; background: linear-gradient(180deg, #ffe066, #ff9f1c); box-shadow: 0 7px 0 #b35a00, 0 12px 26px #0006; }
+.go:hover { filter: brightness(1.08); } .go:active { transform: translateY(4px); box-shadow: 0 3px 0 #b35a00; }
+.go kbd { background: #0002; border-color: #0003; vertical-align: middle; }
+#padbox { position: absolute; right: 48px; top: 58px; width: 380px; padding: 14px 18px; border-radius: 22px; background: #0b3b5fcc; border: 3px solid #fff5; }
+.padhead { font: 800 20px 'Baloo 2'; }
+.padrec { font-weight: 600; color: var(--sun); font-size: 15px; line-height: 1.25; margin-top: 2px; }
+#padstatus { margin-top: 8px; font-size: 13px; opacity: .75; }
+#padstatus.on { opacity: 1; color: #8dff7a; }
+.padmap { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 3px 12px; font-size: 13px; font-weight: 600; }
+.padmap b { color: #8fe3ff; margin-right: 4px; }
+.howto { margin-top: 12px; padding-top: 10px; border-top: 2px dashed #fff4; font-size: 14px; line-height: 1.35; }
+.howto b { color: var(--sun); } .howto .blk { background: #111; padding: 0 6px; border-radius: 6px; }
+.menu-right { position: absolute; right: 60px; bottom: 90px; text-align: right; }
+#charname { font: 800 64px 'Baloo 2'; text-shadow: 0 5px 0 #0006; line-height: 1; }
+#charblurb { font-weight: 600; font-size: 20px; color: var(--sun); text-shadow: 0 2px 0 #0006; }
+.controls { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 48px; display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 14px; font-weight: 600; background: linear-gradient(0deg, #0b3b5fcc, transparent); }
+@media (max-height: 900px) { .menu-left, #padbox { transform: scale(.85); } .menu-left { transform-origin: top left; } #padbox { transform-origin: top right; } }
+@media (max-height: 760px) { .menu-left, #padbox { transform: scale(.72); } }
+
+/* HUD */
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 5; font-family: 'Baloo 2'; text-shadow: 0 3px 0 #0007; }
+#tl { position: absolute; left: 30px; top: 18px; }
+#lapbox { font-weight: 800; font-size: 30px; color: var(--sun); } #lapbox b { color: #fff; font-size: 40px; }
+#time { font-weight: 700; font-size: 24px; margin-top: -6px; }
+#fruit { font-weight: 800; font-size: 30px; } #fruit small { font-size: 18px; opacity: .8; }
+#itembox { position: absolute; left: 50%; top: 16px; width: 104px; height: 104px; margin-left: -52px; border-radius: 22px; background: #0006; border: 4px solid #fff; display: grid; place-items: center; box-shadow: 0 6px 0 #0004; }
+#itemicon { font-size: 60px; line-height: 1; text-shadow: none; }
+#itembox small { position: absolute; bottom: -26px; white-space: nowrap; font-weight: 800; font-size: 16px; color: var(--sun); }
+#itembox.roll #itemicon { animation: wob .12s linear infinite; }
+@keyframes wob { 50% { transform: scale(.85) rotate(10deg); } }
+#minimap { position: absolute; right: 24px; top: 18px; width: 200px; height: 200px; }
+#posbox { position: absolute; left: 30px; bottom: 16px; font-weight: 800; font-size: 120px; line-height: .9; color: #fff; text-shadow: 0 6px 0 #e8322b, 0 10px 0 #7a1d12, 0 14px 22px #0007; }
+#posbox sup { font-size: 46px; vertical-align: top; margin-left: 2px; }
+#standings { position: absolute; left: 30px; top: 180px; font: 700 16px 'Fredoka'; }
+#standings div { padding: 2px 12px 2px 8px; margin-bottom: 3px; border-radius: 10px; background: #0005; border-left: 5px solid var(--c); width: 180px; display: flex; gap: 8px; }
+#standings div.me { background: #ffd23f55; }
+#standings em { font-style: normal; margin-left: auto; }
+#meter { position: absolute; left: 50%; bottom: 72px; width: 360px; height: 26px; margin-left: -180px; border-radius: 99px; background: #0007; border: 3px solid #fff; overflow: hidden; opacity: 0; transition: opacity .15s; }
+#meter.on { opacity: 1; }
+#meterfill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, #3fbf3f, #ffd23f); }
+#meter.hot #meterfill { background: linear-gradient(90deg, #ff8a1f, #e8322b); }
+#meterzone { position: absolute; left: 70%; top: 0; bottom: 0; right: 0; border-left: 3px solid #fff; background: repeating-linear-gradient(45deg, #e8322b44 0 8px, transparent 8px 16px); }
+#turbos { position: absolute; right: -0px; top: -4px; font: 800 20px 'Baloo 2'; }
+#speed { position: absolute; right: 30px; bottom: 18px; text-align: right; } #speed b { font-size: 64px; font-weight: 800; } #speed small { display: block; margin-top: -14px; font-weight: 700; font-size: 18px; opacity: .85; }
+#msg { position: absolute; left: 0; right: 0; top: 24%; text-align: center; font-weight: 800; font-size: 56px; color: var(--sun); opacity: 0; transition: opacity .2s; text-shadow: 0 4px 0 #c4561a, 0 8px 16px #0007; }
+#msg.show { opacity: 1; }
+#pop { position: absolute; left: 0; right: 0; bottom: 110px; text-align: center; font-weight: 800; font-size: 34px; color: #fff; }
+#pop.show { animation: popin .7s ease-out; }
+@keyframes popin { from { transform: scale(1.6); opacity: 0; } 25% { opacity: 1; transform: scale(1); } to { opacity: 0; transform: translateY(-30px); } }
+#count { position: absolute; left: 0; right: 0; top: 30%; text-align: center; font-weight: 800; font-size: 170px; color: #fff; text-shadow: 0 8px 0 #e8322b, 0 14px 0 #7a1d12, 0 20px 30px #0008; }
+#count.pop { animation: cnt .9s ease-out forwards; }
+@keyframes cnt { from { transform: scale(2); opacity: 0; } 20% { transform: scale(1); opacity: 1; } 75% { opacity: 1; } to { opacity: 0; transform: scale(.9); } }
+#fade { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 6; transition: opacity .25s; }
+
+.overlay { position: fixed; inset: 0; z-index: 12; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: radial-gradient(ellipse at center, #0b3b5fcc, #062238ee); }
+.overlay h2 { margin: 0 0 14px; font: 800 72px 'Baloo 2'; color: var(--sun); text-shadow: 0 5px 0 #c4561a, 0 10px 20px #0007; }
+.overlay button { min-width: 260px; padding: 12px 24px; border-radius: 18px; border: 3px solid #fff6; background: #0006; font: 700 20px 'Fredoka'; }
+.overlay button:hover { background: #ffd23f; color: #5a2a00; }
+.overlay .row { margin-top: 16px; gap: 14px; }
+#resbody { min-width: 520px; }
+.res { display: grid; grid-template-columns: 54px 44px 1fr 120px; align-items: center; padding: 8px 16px; margin-bottom: 6px; border-radius: 14px; background: #0005; border-left: 6px solid var(--c); font: 700 22px 'Fredoka'; }
+.res.me { background: #ffd23f44; }
+.res b { font: 800 30px 'Baloo 2'; } .res .em { font-size: 28px; } .res span:last-child { text-align: right; }

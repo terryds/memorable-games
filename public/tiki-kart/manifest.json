@@ -1,0 +1,11 @@
+{
+  "name": "Tiki Kart Rally",
+  "short_name": "Tiki Kart",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#1ea7e1",
+  "theme_color": "#1ea7e1",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }],
+  "scope": "./"
+}

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Memorable Games — a tribute to the games we grew up with</title>
-<meta name="description" content="Fruit Ninja, Flappy Bird, Doodle Jump, Two Cars, Guitar Hero and 2048 — the mobile games you remember, rebuilt for the browser — plus Carbon Nights, a 3D street racer for desktop. Free, no install, no ads.">
+<meta name="description" content="Fruit Ninja, Flappy Bird, Doodle Jump, Two Cars, Guitar Hero and 2048 — the mobile games you remember, rebuilt for the browser — plus two 3D racers for desktop: Carbon Nights and Tiki Kart Rally. Free, no install, no ads.">
 <meta name="theme-color" content="#120a24">
 <link rel="icon" href="assets/icon.svg">
 <link rel="apple-touch-icon" href="assets/icon.svg">
@@ -120,6 +120,10 @@
   }
   .dcard::before { content: ""; position: absolute; inset: 0; z-index: -1;
     background: radial-gradient(60% 80% at 0% 0%, #00e5ff33, transparent 60%), radial-gradient(50% 70% at 100% 100%, #ff7a1a33, transparent 60%); }
+  .dcard + .dcard { margin-top: 22px; }
+  .dcard.sunny { background: linear-gradient(135deg, #0e6fa8, #1ea7e1 45%, #f2b134); }
+  .dcard.sunny::before { background: radial-gradient(60% 80% at 0% 0%, #ffffff40, transparent 60%), radial-gradient(50% 70% at 100% 100%, #ffd23f55, transparent 60%); }
+  .dcard.sunny h3 { background: linear-gradient(90deg, #fff, #fff3b0); -webkit-background-clip: text; background-clip: text; }
   .dcard:hover { transform: translateY(-4px); box-shadow: 0 18px 40px #0008, 0 0 0 2px #00e5ff55; }
   .monitor { position: relative; padding: 8px 8px 0; border-radius: 16px 16px 6px 6px; background: #05060c; box-shadow: 0 16px 34px #000a, inset 0 0 0 2px #ffffff1c; }
   .monitor img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 9px; background: #000; }
@@ -163,19 +167,19 @@
   <div class="floaters" aria-hidden="true">
     <span style="left:6%;top:22%">🚗</span><span style="left:88%;top:18%;animation-delay:-1s">🍉</span>
     <span style="left:12%;top:68%;animation-delay:-2s">🐦</span><span style="left:84%;top:62%;animation-delay:-3s">🎸</span>
-    <span style="left:50%;top:6%;animation-delay:-1.5s;font-size:26px">⭐</span><span style="left:72%;top:84%;animation-delay:-2.5s;font-size:28px">🔢</span><span style="left:26%;top:86%;animation-delay:-3.5s;font-size:30px">🏎️</span>
+    <span style="left:50%;top:6%;animation-delay:-1.5s;font-size:26px">⭐</span><span style="left:72%;top:84%;animation-delay:-2.5s;font-size:28px">🔢</span><span style="left:26%;top:86%;animation-delay:-3.5s;font-size:30px">🏎️</span><span style="left:92%;top:40%;animation-delay:-4s;font-size:30px">🏝️</span>
   </div>
   <div class="wrap hero">
-    <span class="badge">🕹️ 6 mobile games + 1 desktop racer · free · no install</span>
+    <span class="badge">🕹️ 6 mobile games + 2 desktop racers · free · no install</span>
     <h1>Memorable<br><span class="grad">Games</span></h1>
     <p class="tribute">A tribute to the games we grew up with.</p>
-    <p class="tagline">The classics you remember from the good old days — rebuilt from scratch to play instantly in your browser, from one-thumb phone hits to a 3D street racer for the big screen. No app store. No ads. Just play.</p>
+    <p class="tagline">The classics you remember from the good old days — rebuilt from scratch to play instantly in your browser, from one-thumb phone hits to 3D racers for the big screen. No app store. No ads. Just play.</p>
     <div class="cta">
       <a class="btn" href="#games">▶ Pick a game</a>
-      <a class="btn ghost" href="#desktop">🏎️ Desktop racer</a>
+      <a class="btn ghost" href="#desktop">🏎️ Desktop racers</a>
       <a class="btn ghost" href="#install">📲 Add to home screen</a>
     </div>
-    <div class="stats"><div><b>7</b>games</div><div><b>0</b>downloads</div><div><b>∞</b>retries</div></div>
+    <div class="stats"><div><b>8</b>games</div><div><b>0</b>downloads</div><div><b>∞</b>retries</div></div>
   </div>
 </header>
 
@@ -209,6 +213,19 @@
           <div class="note phone-only">📵 Needs a computer with a keyboard or game controller.</div>
         </div>
       </a>
+      <a class="dcard sunny" href="tiki-kart/">
+        <span class="best" id="tkBest"></span>
+        <div class="monitor"><img src="assets/shots/tiki-kart.jpg" alt="Tiki Kart Rally screenshot" loading="lazy" width="1280" height="720"></div>
+        <div class="info">
+          <span class="num">NO. 08 · DESKTOP</span>
+          <h3>Tiki Kart Rally</h3>
+          <span class="meta">3D kart racing · inspired by a 1999 classic</span>
+          <p>Six cartoon racers, one sunny island: beach straights, a temple tunnel, a cliff jump over the waterfall ravine and a rope bridge across the lagoon. Powerslide-turbo chains, item boxes, homing rockets and TNT.</p>
+          <div class="how"><span class="rec">🎮 Controller recommended</span><span>⌨️ Keyboard works</span><span>🔥 Powerslide turbos</span><span>🚀 Items &amp; weapons</span></div>
+          <span class="play">▶ Play on desktop</span>
+          <div class="note phone-only">📵 Needs a computer with a keyboard or game controller.</div>
+        </div>
+      </a>
     </div>
   </section>
 
@@ -218,7 +235,7 @@
       <div class="install">
         <div class="step"><div class="ico">📱</div><h4>iPhone / iPad (Safari)</h4><ol><li>Open a game</li><li>Tap the <b>Share</b> button</li><li>Choose <b>Add to Home Screen</b></li></ol></div>
         <div class="step"><div class="ico">🤖</div><h4>Android (Chrome)</h4><ol><li>Open a game</li><li>Tap the <b>⋮</b> menu</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b></li></ol></div>
-        <div class="step"><div class="ico">💻</div><h4>Desktop</h4><ol><li>Just click and play</li><li>Keyboard controls are listed in each game</li><li>Turn the sound on for Guitar Hero 🎸</li><li>Plug in a controller for Carbon Nights 🏎️</li></ol></div>
+        <div class="step"><div class="ico">💻</div><h4>Desktop</h4><ol><li>Just click and play</li><li>Keyboard controls are listed in each game</li><li>Turn the sound on for Guitar Hero 🎸</li><li>Plug in a controller for the racers 🏎️</li></ol></div>
       </div>
       <div class="why">
         <div>⚡<b>Instant</b><span>Every game is a single tiny page. It loads in a blink, even on slow data.</span></div>
@@ -274,6 +291,8 @@
       </div>
     </a>`).join("");
   const cnBest = +localStorage.getItem("cn-drift-best") || 0;
+  const tkWins = +localStorage.getItem("tiki.wins") || 0;
+  if (tkWins > 0) { const el = document.getElementById("tkBest"); el.textContent = "🏆 Wins: " + tkWins; el.style.display = "block"; el.style.zIndex = 2; }
   if (cnBest > 0) { const el = document.getElementById("cnBest"); el.textContent = "🏆 Best drift: " + cnBest.toLocaleString(); el.style.display = "block"; el.style.zIndex = 2; }
   GAMES.forEach((g, i) => {
     const b = g.best();

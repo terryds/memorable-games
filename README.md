@@ -3,7 +3,7 @@
 *A tribute to the games we grew up with.*
 
 The classics you remember — rebuilt from scratch to play instantly in the browser: six mobile
-hits plus a 3D street racer for the big screen.
+hits plus two 3D racers for the big screen.
 Live at **https://games.terrydjony.com**
 
 | # | Game | Path | Controls |
@@ -20,10 +20,15 @@ Live at **https://games.terrydjony.com**
 | # | Game | Path | Controls |
 |---|------|------|----------|
 | 7 | 🏎️ Carbon Nights | `/carbon-nights/` | Game controller recommended (RT gas, LT brake, A drift, B nitro). Keyboard: W/S, A/D, Space = handbrake, Shift = nitro, Q = Speedbreaker, C = camera, R = reset |
+| 8 | 🏝️ Tiki Kart Rally | `/tiki-kart/` | Controller recommended (A/RT gas, RB hop + powerslide, LB turbo, B item). Keyboard: W/S, A/D, Space = hop/slide, Shift = turbo, E = item, R = rescue |
 
 Carbon Nights is a Three.js street racer inspired by a 2006 night-racing classic: a wet neon
 downtown, a canyon road with a view over the city, and a waterfront run past a lit suspension
 bridge. Circuit Race (vs 3 AI rivals), Drift Attack and Free Roam; Tuner / Muscle / Exotic cars.
+
+Tiki Kart Rally is a cartoon kart racer inspired by a 1999 kart classic: 3 laps of Tiki Island
+(beach, temple tunnel, a cliff jump over a waterfall ravine, rope bridge) against 5 AI racers, with
+powerslide turbo chains, item boxes (homing rockets, bombs, TNT, shields, turbos) and fruit.
 
 ## How it's built
 
@@ -35,16 +40,17 @@ bridge. Circuit Race (vs 3 AI rivals), Drift Attack and Free Roam; Tuner / Muscl
 - **Mobile-first**: touch controls, safe-area insets, no zoom/scroll bounce, and each game
   can be installed to the home screen (opens full-screen).
 - **High scores** live in `localStorage` (per-game key prefixes: `twocars.`, `dj.`, `fn.`,
-  `flappy.`, `gh.`, `g2048.`, `cn-`), so the landing page can show your personal bests.
-- **The desktop game is the one exception to "no build step"**: Carbon Nights uses Three.js, so its
-  source lives in `desktop/carbon-nights/` and is bundled with Bun into
-  `public/carbon-nights/dist/main.js`. The bundle is committed, so deploying still needs no build.
+  `flappy.`, `gh.`, `g2048.`, `cn-`, `tiki`), so the landing page can show your personal bests.
+- **The desktop games are the one exception to "no build step"**: they use Three.js, so their
+  source lives in `desktop/<game>/` and is bundled with Bun into `public/<game>/dist/main.js`.
+  The bundles are committed, so deploying still needs no build.
 
 ```
 .
 ├── wrangler.jsonc        # Cloudflare Workers config (serves ./public as static assets)
 ├── desktop/
-│   └── carbon-nights/    # Three.js source for the desktop racer (src/, test/ physics sims)
+│   ├── carbon-nights/    # Three.js source for the street racer (src/, test/ physics sims)
+│   └── tiki-kart/        # Three.js source for the kart racer (src/, test/ race + item sims)
 └── public/               # everything that gets deployed
     ├── index.html        # landing page
     ├── 404.html          # "Game over" not-found page
@@ -58,7 +64,8 @@ bridge. Circuit Race (vs 3 AI rivals), Drift Attack and Free Roam; Tuner / Muscl
     ├── flappy-bird/
     ├── guitar-hero/
     ├── 2048/
-    └── carbon-nights/    # index.html, style.css, manifest, icon + dist/main.js (built bundle)
+    ├── carbon-nights/    # index.html, style.css, manifest, icon + dist/main.js (built bundle)
+    └── tiki-kart/        # same layout
 ```
 
 All paths inside `public/` are relative, so the site works from any host or sub-path.
@@ -72,14 +79,14 @@ npx serve public          # or: python3 -m http.server 8080 -d public
 npx wrangler dev          # same as production, via Cloudflare's local runtime (Node 22+)
 ```
 
-### Rebuilding Carbon Nights
+### Rebuilding a desktop game
 
-After editing anything in `desktop/carbon-nights/src/`:
+After editing anything in `desktop/<game>/src/` (`carbon-nights` or `tiki-kart`):
 
 ```bash
-cd desktop/carbon-nights
+cd desktop/<game>
 bun install
-bun run build             # writes ../../public/carbon-nights/dist/main.js — commit it
+bun run build             # writes ../../public/<game>/dist/main.js — commit it
 bun run sim               # optional: headless AI race to sanity-check physics
 ```
 

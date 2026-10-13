@@ -1,0 +1,12 @@
+{
+  "name": "tiki-kart",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build src/main.js --outdir ../../public/tiki-kart/dist --minify --target browser",
+    "sim": "bun test/sim.js"
+  },
+  "dependencies": {
+    "three": "^0.186.1"
+  }
+}

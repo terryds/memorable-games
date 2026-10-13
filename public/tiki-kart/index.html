@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tiki Kart Rally — Island Kart Racing</title>
+<link rel="icon" href="icon.svg" />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#1ea7e1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="loading">
+  <div class="logo">TIKI<b>KART RALLY</b></div>
+  <div class="bar"><i id="loadbar"></i></div>
+  <div id="loadtext">Pumping the tyres…</div>
+</div>
+
+<div id="menu" class="hidden">
+  <a class="homeLink" href="../">← All games</a>
+  <div class="menu-left">
+    <div class="logo">TIKI<b>KART RALLY</b></div>
+    <div class="tag">3 laps around Tiki Island · 6 racers · powerslide turbos</div>
+    <h3>Pick your racer</h3>
+    <div id="chars"></div>
+    <h3>Difficulty</h3>
+    <div class="row" id="diffs">
+      <button class="pill" data-diff="easy">Easy</button>
+      <button class="pill" data-diff="medium">Medium</button>
+      <button class="pill" data-diff="hard">Hard</button>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button id="optMusic" class="pill small">Music: ON</button>
+      <button id="optQuality" class="pill small">Graphics: HIGH</button>
+    </div>
+    <button id="go" class="go">RACE! <kbd>ENTER</kbd></button>
+  </div>
+  <div id="padbox">
+    <div class="padhead">🎮 Controller supported</div>
+    <div class="padrec">Recommended! Analog steering + shoulder buttons make powerslide turbos way easier.</div>
+    <div id="padstatus">No controller detected — plug one in and press any button.</div>
+    <div class="padmap">
+      <span><b>Left stick</b> Steer</span>
+      <span><b>A / ✕ or RT</b> Gas</span>
+      <span><b>LT / L2</b> Brake / Reverse</span>
+      <span><b>RB / R1</b> Hop + powerslide</span>
+      <span><b>LB / L1</b> Turbo (in a slide)</span>
+      <span><b>B / ○</b> Use item</span>
+      <span><b>View / Share</b> Rescue</span>
+      <span><b>Menu / Options</b> Pause</span>
+    </div>
+    <div class="howto"><b>Powerslide turbo:</b> hold <i>hop</i> while turning to slide. When the exhaust smoke turns <span class="blk">black</span> (meter in the red), tap <i>turbo</i>. Chain up to 3 per slide!</div>
+  </div>
+  <div class="menu-right"><div id="charname"></div><div id="charblurb"></div></div>
+  <div class="controls">
+    <span><kbd>W</kbd><kbd>↑</kbd> Gas</span>
+    <span><kbd>S</kbd><kbd>↓</kbd> Brake</span>
+    <span><kbd>A</kbd><kbd>D</kbd> Steer</span>
+    <span><kbd>SPACE</kbd> Hop / slide</span>
+    <span><kbd>SHIFT</kbd> Turbo in slide</span>
+    <span><kbd>E</kbd><kbd>CTRL</kbd> Use item</span>
+    <span><kbd>C</kbd> Camera</span>
+    <span><kbd>R</kbd> Rescue</span>
+    <span><kbd>ESC</kbd> Pause</span>
+  </div>
+</div>
+
+<div id="hud" class="hidden">
+  <div id="tl">
+    <div id="lapbox">LAP <b id="lap">1/3</b></div>
+    <div id="time">0:00.00</div>
+    <div id="fruit">🥭 <b id="fruitn">0</b><small>/10</small></div>
+  </div>
+  <div id="itembox"><div id="itemicon"></div><small id="itemname"></small></div>
+  <canvas id="minimap" width="400" height="400"></canvas>
+  <div id="posbox"><span id="pos">6</span><sup id="possuf">th</sup></div>
+  <div id="standings"></div>
+  <div id="meter"><div id="meterfill"></div><div id="meterzone"></div><span id="turbos"></span></div>
+  <div id="speed"><b id="kmh">0</b><small>km/h</small></div>
+  <div id="msg"></div>
+  <div id="count"></div>
+  <div id="pop"></div>
+</div>
+
+<div id="pause" class="overlay hidden">
+  <h2>PAUSED</h2>
+  <button data-act="resume">Resume</button>
+  <button data-act="restart">Restart Race</button>
+  <button data-act="menu">Quit to Menu</button>
+</div>
+
+<div id="results" class="overlay hidden">
+  <h2 id="restitle">RACE OVER</h2>
+  <div id="resbody"></div>
+  <div class="row">
+    <button data-act="restart">Race Again <kbd>ENTER</kbd></button>
+    <button data-act="menu">Menu <kbd>ESC</kbd></button>
+  </div>
+</div>
+<div id="fade"></div>
+<script type="module" src="dist/main.js"></script>
+</body>
+</html>
