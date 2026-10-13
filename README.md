@@ -1,7 +1,9 @@
-# Memorable Mobile Games
+# Memorable Games
 
-The mobile classics you remember — rebuilt from scratch to play instantly in the browser —
-plus a 3D street racer for the big screen.
+*A tribute to the games we grew up with.*
+
+The classics you remember — rebuilt from scratch to play instantly in the browser: six mobile
+hits plus a 3D street racer for the big screen.
 Live at **https://games.terrydjony.com**
 
 | # | Game | Path | Controls |
@@ -87,7 +89,7 @@ Connect the repo in **Cloudflare dashboard → Workers & Pages → Create → Im
 
 | Field | Value |
 |-------|-------|
-| Project name | `memorable-mobile-games` (must match `name` in `wrangler.jsonc`) |
+| Project name | `memorable-mobile-games` (must match `name` in `wrangler.jsonc` — the Worker keeps its original name; rename both together if you ever change it) |
 | Build command | *(leave empty)* |
 | Deploy command | `npx wrangler deploy` |
 | Preview command | `npx wrangler preview` (or leave the default) |
