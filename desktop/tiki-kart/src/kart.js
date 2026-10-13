@@ -153,7 +153,7 @@ export class Kart {
   boost(level, time) {
     this.boostTime = Math.max(this.boostTime, time);
     this.boostLevel = Math.max(this.boostTime > 0 ? this.boostLevel : 0, level);
-    this.speed = Math.max(this.speed, this.top * (1.0 + 0.04 * level));
+    this.speed = Math.max(this.speed, this.top * (1.1 + 0.05 * level)); // immediate kick
     this.events.push({ type: 'boost', level });
   }
 
@@ -194,7 +194,7 @@ export class Kart {
     if (this.boostTime > 0) { this.boostTime -= dt; top *= 1.22 + 0.07 * this.boostLevel; } else this.boostLevel = 0;
     if (!this.airborne) {
       if (inp.throttle > 0 && this.speed > -1) {
-        if (this.speed < top) this.speed += (s.accel * inp.throttle * (1 - Math.pow(Math.max(0, this.speed) / top, 2.2)) + (this.boostTime > 0 ? 30 : 0)) * dt;
+        if (this.speed < top) this.speed += (s.accel * inp.throttle * (1 - Math.pow(Math.max(0, this.speed) / top, 2.2)) + (this.boostTime > 0 ? 45 : 0)) * dt;
       }
       if (inp.brake > 0) this.speed -= (this.speed > 0.5 ? 34 : 12) * inp.brake * dt;
       if (this.speed < -9) this.speed = -9;
@@ -274,6 +274,11 @@ export class Kart {
         this.events.push({ type: 'launch' });
       }
       this.lastSafe = q.i;
+      // boost pads on the road
+      this.padCd = Math.max(0, (this.padCd || 0) - dt);
+      for (const pd of track.pads) {
+        if (this.padCd <= 0 && (q.i - pd.i + N) % N <= 3 && Math.abs(q.lat - pd.lat) < 2.9) { this.boost(2, 1.1); this.padCd = 0.8; this.events.push({ type: 'pad' }); }
+      }
     }
 
     // walls

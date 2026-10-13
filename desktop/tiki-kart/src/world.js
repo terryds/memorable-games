@@ -221,8 +221,7 @@ export function buildWorld(scene, track, terrain, gradient) {
     const tex = T.boostPadTexture(); tex.repeat.set(1, 1);
     const mat = new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color(1.6, 1.6, 1.6) });
     world.pads = [];
-    for (const i of track.boostPads) {
-      const lat = ((i * 7) % 3 - 1) * 3.5;
+    for (const { i, lat } of track.pads) {
       const pad = new THREE.Mesh(track.sweep([[lat - 2.6, 0.06], [lat + 2.6, 0.06]], [[i, i + 3]], { uvAcross: [0, 1], vScale: 1 / 6 }), mat);
       scene.add(pad);
       world.pads.push({ i, lat });

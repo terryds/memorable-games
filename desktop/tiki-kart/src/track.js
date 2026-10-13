@@ -43,6 +43,7 @@ export class Track {
     mark(cp[7], cp[9], 4);
     mark((cp[18] + 4) % N, (cp[19] + 2) % N, 8);
     this.boostPads = [(cp[2] + 6) % N, cp[16], (cp[21] + 4) % N, (cp[5] + 4) % N];
+    this.pads = this.boostPads.map((i) => ({ i, lat: ((i * 7) % 3 - 1) * 3.5 }));
     this.itemRows = [(cp[3] + 8) % N, (cp[10] + 4) % N, (cp[15] + 6) % N, (cp[20] + 6) % N];
     this.fruitLines = [(cp[1] + 22) % N, (cp[6] + 6) % N, (cp[11] + 2) % N, (cp[17] + 4) % N, (cp[22] + 4) % N, (cp[8] + 6) % N];
     this.startIdx = (cp[1] - 8 + N) % N;

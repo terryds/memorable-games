@@ -89,7 +89,13 @@ const keys = new Set();
 addEventListener('keydown', (e) => {
   if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.code)) e.preventDefault();
   keys.add(e.code);
-  if (!e.repeat) onKey(e.code);
+  if (!e.repeat) {
+    // latch quick taps so they're never lost between frames
+    if (['KeyE', 'KeyF', 'ControlLeft', 'ControlRight'].includes(e.code)) G.tapItem = true;
+    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') G.tapBoost = true;
+    if (e.code === 'Space') G.tapDrift = true;
+    onKey(e.code);
+  }
 });
 addEventListener('keyup', (e) => keys.delete(e.code));
 addEventListener('blur', () => keys.clear());
@@ -115,6 +121,7 @@ function readInput() {
     inp.boost ||= !!gp.buttons[4]?.pressed;
     inp.item ||= !!(gp.buttons[1]?.pressed || gp.buttons[2]?.pressed);
   }
+  inp.boost ||= !!G.tapBoost; inp.drift ||= !!G.tapDrift;
   return inp;
 }
 let padPrev = [];
@@ -133,7 +140,9 @@ function pollPad() {
     if (dir) { const i = CHARACTERS.findIndex((c) => c.id === settings.char); settings.char = CHARACTERS[(i + dir + CHARACTERS.length) % CHARACTERS.length].id; save(); syncMenu(); previewKart(); }
   } else if (s === 'results') { if (hit(0) || hit(9)) startRace(); else if (hit(1)) enterMenu(); }
   else if (s === 'paused') { if (hit(9) || hit(1)) resume(); }
-  else if (s === 'race' || s === 'countdown') { if (hit(9)) pause(); if (hit(8)) rescue(); if (hit(3)) G.camMode = (G.camMode + 1) % 2; }
+  else if (s === 'race' || s === 'countdown') {
+    if (hit(1) || hit(2)) G.tapItem = true; if (hit(4)) G.tapBoost = true; if (hit(5)) G.tapDrift = true;
+    if (hit(9)) pause(); if (hit(8)) rescue(); if (hit(3)) G.camMode = (G.camMode + 1) % 2; }
   padPrev = down; padPrev.ax = ax;
 }
 function onKey(code) {
@@ -252,6 +261,7 @@ function handleEvents(k) {
       if (me) { audio.sfx('turbo', e.n); popup(e.perfect ? `PERFECT TURBO ×${e.n}!` : `TURBO ×${e.n}`, e.perfect ? '#ffd23f' : '#8fe3ff'); if (e.perfect) audio.sfx('perfect'); }
     } else if (e.type === 'fizzle' && me) { audio.sfx('fizzle'); popup('TOO EARLY!', '#ff6b6b'); }
     else if (e.type === 'hop' && me) audio.sfx('hop');
+    else if (e.type === 'pad' && me) { audio.sfx('turbo', 2); popup('BOOST!', '#8fe3ff'); }
     else if (e.type === 'hangtime') { if (me) { popup(`HANG TIME ${e.t.toFixed(1)}s!`, '#ffd23f'); audio.sfx('turbo', 1); } }
     else if (e.type === 'wall' && me) audio.sfx('wall', e.v);
     else if (e.type === 'fall') { if (me) { audio.sfx('splash'); message('SPLASH!', 1.2); } for (let j = 0; j < 30; j++) fx.dust.emit(k.x, Math.max(0, k.y), k.z, (Math.random() - 0.5) * 8, 4 + Math.random() * 6, (Math.random() - 0.5) * 8, 1, 1.4, 2, 0.8, 0.85, 0.95, 1); }
@@ -266,7 +276,8 @@ function simulate(h) {
   const p = G.player, order = standings();
   let inp = p.finished && G.playerAI ? G.playerAI.input(h, G.karts, 0, G.raceTime) : readInput();
   p.throttleIn = inp.throttle;
-  const itemDown = inp.item && !G.itemPrev; G.itemPrev = inp.item;
+  const itemDown = (inp.item && !G.itemPrev) || G.tapItem; G.itemPrev = inp.item;
+  G.tapItem = G.tapBoost = G.tapDrift = false;
   p.update(h, inp, track);
   handleEvents(p);
   if (itemDown && p.item && !p.finished) items.use(p, order);
