@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Memorable Games — a tribute to the games we grew up with</title>
-<meta name="description" content="Fruit Ninja, Flappy Bird, Doodle Jump, Two Cars, Guitar Hero and 2048 — the mobile games you remember, rebuilt for the browser — plus two 3D racers for desktop: Carbon Nights and Tiki Kart Rally. Free, no install, no ads.">
+<meta name="description" content="Fruit Ninja, Flappy Bird, Doodle Jump, Two Cars, Guitar Hero and 2048 — the mobile games you remember, rebuilt for the browser — plus 3D desktop games: the Carbon Nights and Tiki Kart Rally racers and the Dust Strike shooter. Free, no install, no ads.">
 <meta name="theme-color" content="#120a24">
 <link rel="icon" href="assets/icon.svg">
 <link rel="apple-touch-icon" href="assets/icon.svg">
@@ -124,6 +124,9 @@
   .dcard.sunny { background: linear-gradient(135deg, #0e6fa8, #1ea7e1 45%, #f2b134); }
   .dcard.sunny::before { background: radial-gradient(60% 80% at 0% 0%, #ffffff40, transparent 60%), radial-gradient(50% 70% at 100% 100%, #ffd23f55, transparent 60%); }
   .dcard.sunny h3 { background: linear-gradient(90deg, #fff, #fff3b0); -webkit-background-clip: text; background-clip: text; }
+  .dcard.desert { background: linear-gradient(135deg, #3a2a18, #8a6236 50%, #d9a85b); }
+  .dcard.desert::before { background: radial-gradient(60% 80% at 0% 0%, #ffffff22, transparent 60%), radial-gradient(50% 70% at 100% 100%, #f2c14e55, transparent 60%); }
+  .dcard.desert h3 { background: linear-gradient(90deg, #fff, #ffe2a8); -webkit-background-clip: text; background-clip: text; }
   .dcard:hover { transform: translateY(-4px); box-shadow: 0 18px 40px #0008, 0 0 0 2px #00e5ff55; }
   .monitor { position: relative; padding: 8px 8px 0; border-radius: 16px 16px 6px 6px; background: #05060c; box-shadow: 0 16px 34px #000a, inset 0 0 0 2px #ffffff1c; }
   .monitor img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 9px; background: #000; }
@@ -173,7 +176,7 @@
     <span class="badge">🕹️ 6 mobile games + 2 desktop racers · free · no install</span>
     <h1>Memorable<br><span class="grad">Games</span></h1>
     <p class="tribute">A tribute to the games we grew up with.</p>
-    <p class="tagline">The classics you remember from the good old days — rebuilt from scratch to play instantly in your browser, from one-thumb phone hits to 3D racers for the big screen. No app store. No ads. Just play.</p>
+    <p class="tagline">The classics you remember from the good old days — rebuilt from scratch to play instantly in your browser, from one-thumb phone hits to 3D racers and a tactical shooter for the big screen. No app store. No ads. Just play.</p>
     <div class="cta">
       <a class="btn" href="#games">▶ Pick a game</a>
       <a class="btn ghost" href="#desktop">🏎️ Desktop racers</a>
@@ -226,6 +229,19 @@
           <div class="note phone-only">📵 Needs a computer with a keyboard or game controller.</div>
         </div>
       </a>
+      <a class="dcard desert" href="dust-strike/">
+        <span class="best" id="dsBest"></span>
+        <div class="monitor"><img src="assets/shots/dust-strike.jpg" alt="Dust Strike screenshot" loading="lazy" width="1280" height="720"></div>
+        <div class="info">
+          <span class="num">NO. 09 · DESKTOP</span>
+          <h3>Dust Strike</h3>
+          <span class="meta">5v5 tactical shooter · inspired by a 2000 classic</span>
+          <p>Terrorists vs Counter-Terrorists on a sun-baked desert bomb map: long A, mid doors, B tunnels. Buy rifles between rounds, plant or defuse the C4, throw smokes and flashbangs, and outgun nine bots in a first-to-8 match.</p>
+          <div class="how"><span class="rec">🖱️ Mouse &amp; keyboard</span><span>💣 Plant · Defuse</span><span>🔫 AK · M4 · AWP</span><span>🤖 5v5 with bots</span></div>
+          <span class="play">▶ Play on desktop</span>
+          <div class="note phone-only">📵 Needs a computer with a mouse and keyboard.</div>
+        </div>
+      </a>
     </div>
   </section>
 
@@ -235,7 +251,7 @@
       <div class="install">
         <div class="step"><div class="ico">📱</div><h4>iPhone / iPad (Safari)</h4><ol><li>Open a game</li><li>Tap the <b>Share</b> button</li><li>Choose <b>Add to Home Screen</b></li></ol></div>
         <div class="step"><div class="ico">🤖</div><h4>Android (Chrome)</h4><ol><li>Open a game</li><li>Tap the <b>⋮</b> menu</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b></li></ol></div>
-        <div class="step"><div class="ico">💻</div><h4>Desktop</h4><ol><li>Just click and play</li><li>Keyboard controls are listed in each game</li><li>Turn the sound on for Guitar Hero 🎸</li><li>Plug in a controller for the racers 🏎️</li></ol></div>
+        <div class="step"><div class="ico">💻</div><h4>Desktop</h4><ol><li>Just click and play</li><li>Keyboard controls are listed in each game</li><li>Turn the sound on for Guitar Hero 🎸</li><li>Plug in a controller for the racers 🏎️</li><li>Grab a mouse for Dust Strike 🔫</li></ol></div>
       </div>
       <div class="why">
         <div>⚡<b>Instant</b><span>Every game is a single tiny page. It loads in a blink, even on slow data.</span></div>
@@ -292,6 +308,8 @@
     </a>`).join("");
   const cnBest = +localStorage.getItem("cn-drift-best") || 0;
   const tkWins = +localStorage.getItem("tiki.wins") || 0;
+  const dsWins = +localStorage.getItem("dust.wins") || 0;
+  if (dsWins > 0) { const el = document.getElementById("dsBest"); el.textContent = "🏆 Matches won: " + dsWins; el.style.display = "block"; el.style.zIndex = 2; }
   if (tkWins > 0) { const el = document.getElementById("tkBest"); el.textContent = "🏆 Wins: " + tkWins; el.style.display = "block"; el.style.zIndex = 2; }
   if (cnBest > 0) { const el = document.getElementById("cnBest"); el.textContent = "🏆 Best drift: " + cnBest.toLocaleString(); el.style.display = "block"; el.style.zIndex = 2; }
   GAMES.forEach((g, i) => {

@@ -1,0 +1,12 @@
+{
+  "name": "dust-strike",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build src/main.js --outdir ../../public/dust-strike/dist --minify --target browser",
+    "sim": "bun test/sim.js"
+  },
+  "dependencies": {
+    "three": "^0.186.1"
+  }
+}

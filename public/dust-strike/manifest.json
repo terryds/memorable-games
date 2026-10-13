@@ -1,0 +1,11 @@
+{
+  "name": "Dust Strike",
+  "short_name": "Dust Strike",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#1b1712",
+  "theme_color": "#1b1712",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }],
+  "scope": "./"
+}

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dust Strike — 5v5 Bomb Defusal</title>
+<link rel="icon" href="icon.svg" />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#1b1712" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Teko:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="loading">
+  <div class="logo">DUST<b>STRIKE</b></div>
+  <div class="bar"><i id="loadbar"></i></div>
+  <div id="loadtext">Loading…</div>
+</div>
+
+<div id="menu" class="hidden">
+  <a class="homeLink" href="../">← All games</a>
+  <div class="menu-card">
+    <div class="logo">DUST<b>STRIKE</b></div>
+    <div class="tag">5v5 bomb defusal on a sun-baked desert map · bots on both teams</div>
+    <h3>Choose your side</h3>
+    <div class="teams">
+      <button class="team t" data-team="T"><b>Terrorists</b><small>Plant the bomb at A or B — or wipe out the CTs</small></button>
+      <button class="team ct" data-team="CT"><b>Counter-Terrorists</b><small>Hold the sites, defuse the bomb, run out the clock</small></button>
+    </div>
+    <div class="cols">
+      <div><h3>Bot skill</h3><div class="row" id="diffs"><button class="pill" data-v="easy">Easy</button><button class="pill" data-v="normal">Normal</button><button class="pill" data-v="hard">Hard</button></div></div>
+      <div><h3>Match</h3><div class="row" id="rounds"><button class="pill" data-v="5">First to 5</button><button class="pill" data-v="8">First to 8</button><button class="pill" data-v="12">First to 12</button></div></div>
+    </div>
+    <div class="row opts">
+      <label>Mouse sensitivity <input type="range" id="sens" min="0.2" max="3" step="0.05" /> <span id="sensv"></span></label>
+    </div>
+    <div class="row">
+      <button id="optVoice" class="pill small">Radio voice: ON</button>
+      <button id="optQuality" class="pill small">Graphics: HIGH</button>
+      <button id="optInvert" class="pill small">Invert Y: OFF</button>
+    </div>
+    <button id="go" class="go">PLAY <kbd>ENTER</kbd></button>
+    <div id="best"></div>
+  </div>
+  <div class="controls">
+    <h4>Controls</h4>
+    <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move</span>
+    <span><kbd>MOUSE</kbd> Aim · <kbd>LMB</kbd> Fire</span>
+    <span><kbd>RMB</kbd> Scope / knife stab / lob grenade</span>
+    <span><kbd>SPACE</kbd> Jump</span>
+    <span><kbd>C</kbd> Crouch <small>(or CTRL in fullscreen)</small></span>
+    <span><kbd>SHIFT</kbd> Walk (silent)</span>
+    <span><kbd>R</kbd> Reload</span>
+    <span><kbd>1</kbd>–<kbd>5</kbd> <kbd>Q</kbd> <kbd>WHEEL</kbd> Weapons</span>
+    <span><kbd>B</kbd> Buy menu</span>
+    <span><kbd>E</kbd> Plant / defuse / pick up</span>
+    <span><kbd>G</kbd> Drop weapon</span>
+    <span><kbd>TAB</kbd> Scoreboard</span>
+    <span><kbd>ESC</kbd> Pause</span>
+  </div>
+  <div class="note phone-only">📵 Dust Strike needs a computer with a mouse and keyboard.</div>
+</div>
+
+<div id="hud" class="hidden">
+  <canvas id="radar" width="220" height="184"></canvas>
+  <div id="top">
+    <div class="tm t"><span id="aliveT"></span><b id="scT">0</b></div>
+    <div id="timer">1:55</div>
+    <div class="tm ct"><b id="scCT">0</b><span id="aliveCT"></span></div>
+  </div>
+  <div id="killfeed"></div>
+  <div id="money">$800</div>
+  <div id="bl"><div id="hp"><i>✚</i><b id="hpv">100</b></div><div id="ar"><i>⛨</i><b id="arv">0</b></div><div id="kit"></div></div>
+  <div id="br"><div id="slots"></div><div id="wname"></div><div id="ammo"><b id="mag">20</b><small id="res">/ 120</small></div></div>
+  <div id="bombIcon" class="hidden">💣 C4</div>
+  <div id="cross"><i class="t"></i><i class="b"></i><i class="l"></i><i class="r"></i></div>
+  <div id="hitmark"></div>
+  <div id="center"></div>
+  <div id="hint"></div>
+  <div id="progress"><span></span><div><i></i></div></div>
+  <div id="dmgdir"></div>
+  <div id="spec"></div>
+  <div id="scope"><i class="h"></i><i class="v"></i></div>
+  <div id="hurt"></div>
+  <div id="flash"></div>
+  <div id="banner"></div>
+  <div id="buymenu" class="hidden"></div>
+  <div id="scores" class="hidden"></div>
+  <div id="toast"></div>
+</div>
+
+<div id="pause" class="hidden">
+  <div class="panel">
+    <h2>Paused</h2>
+    <button id="resume" class="go">RESUME</button>
+    <label>Mouse sensitivity <input type="range" id="sens2" min="0.2" max="3" step="0.05" /> <span id="sensv2"></span></label>
+    <label>Volume <input type="range" id="vol" min="0" max="1" step="0.05" /></label>
+    <button id="quit" class="pill">Quit to menu</button>
+  </div>
+</div>
+
+<div id="over" class="hidden">
+  <div class="panel">
+    <h2 id="overTitle"></h2>
+    <div id="overScore"></div>
+    <div id="overStats"></div>
+    <div class="row"><button id="again" class="go">PLAY AGAIN</button><button id="toMenu" class="pill">Menu</button></div>
+  </div>
+</div>
+
+<div id="clickToPlay" class="hidden"><div>Click to play</div><small>Mouse look needs pointer lock</small></div>
+<script type="module" src="dist/main.js"></script>
+</body>
+</html>

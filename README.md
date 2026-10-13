@@ -3,7 +3,7 @@
 *A tribute to the games we grew up with.*
 
 The classics you remember — rebuilt from scratch to play instantly in the browser: six mobile
-hits plus two 3D racers for the big screen.
+hits plus 3D racers and a tactical shooter for the big screen.
 Live at **https://games.terrydjony.com**
 
 | # | Game | Path | Controls |
@@ -21,6 +21,7 @@ Live at **https://games.terrydjony.com**
 |---|------|------|----------|
 | 7 | 🏎️ Carbon Nights | `/carbon-nights/` | Game controller recommended (RT gas, LT brake, A drift, B nitro). Keyboard: W/S, A/D, Space = handbrake, Shift = nitro, Q = Speedbreaker, C = camera, R = reset |
 | 8 | 🏝️ Tiki Kart Rally | `/tiki-kart/` | Controller recommended (A/RT gas, RB hop + powerslide, LB turbo, B item). Keyboard: W/S, A/D, Space = hop/slide, Shift = turbo, E = item, R = rescue |
+| 9 | 💣 Dust Strike | `/dust-strike/` | Mouse & keyboard: WASD, mouse aim, LMB fire, RMB scope/stab/lob, Space jump, C (or Ctrl in fullscreen) crouch, Shift walk, R reload, 1–5/Q/wheel weapons, B buy, E plant/defuse/pick up, G drop, Tab scores |
 
 Carbon Nights is a Three.js street racer inspired by a 2006 night-racing classic: a wet neon
 downtown, a canyon road with a view over the city, and a waterfront run past a lit suspension
@@ -29,6 +30,14 @@ bridge. Circuit Race (vs 3 AI rivals), Drift Attack and Free Roam; Tuner / Muscl
 Tiki Kart Rally is a cartoon kart racer inspired by a 1999 kart classic: 3 laps of Tiki Island
 (beach, temple tunnel, a cliff jump over a waterfall ravine, rope bridge) against 5 AI racers, with
 powerslide turbo chains, item boxes (homing rockets, bombs, TNT, shields, turbos) and fruit.
+
+Dust Strike is a 5v5 bomb-defusal shooter inspired by a 2000 tactical-shooter classic: a desert map
+with long A, catwalk, mid doors and B tunnels; Terrorists vs Counter-Terrorists with bots filling both
+teams (easy / normal / hard). Round economy and buy menu (Glock, USP-S, Desert Eagle, MP5-SD, AK-47,
+M4A1, AWP, HE / flash / smoke grenades, kevlar, defuse kit), spray patterns and movement inaccuracy,
+headshots, planting/defusing, a radar and a first-to-5/8/12 match. The simulation (`desktop/dust-strike/src/sim.js`,
+`bots.js`, `map.js`) has no DOM or three.js dependency, so `bun test/sim.js [easy|normal|hard]` plays
+full bot-vs-bot matches headlessly and `bun test/player.js` checks buying, planting, defusing and recoil.
 
 ## How it's built
 
@@ -40,7 +49,7 @@ powerslide turbo chains, item boxes (homing rockets, bombs, TNT, shields, turbos
 - **Mobile-first**: touch controls, safe-area insets, no zoom/scroll bounce, and each game
   can be installed to the home screen (opens full-screen).
 - **High scores** live in `localStorage` (per-game key prefixes: `twocars.`, `dj.`, `fn.`,
-  `flappy.`, `gh.`, `g2048.`, `cn-`, `tiki`), so the landing page can show your personal bests.
+  `flappy.`, `gh.`, `g2048.`, `cn-`, `tiki`, `dust`), so the landing page can show your personal bests.
 - **The desktop games are the one exception to "no build step"**: they use Three.js, so their
   source lives in `desktop/<game>/` and is bundled with Bun into `public/<game>/dist/main.js`.
   The bundles are committed, so deploying still needs no build.
@@ -50,7 +59,8 @@ powerslide turbo chains, item boxes (homing rockets, bombs, TNT, shields, turbos
 ├── wrangler.jsonc        # Cloudflare Workers config (serves ./public as static assets)
 ├── desktop/
 │   ├── carbon-nights/    # Three.js source for the street racer (src/, test/ physics sims)
-│   └── tiki-kart/        # Three.js source for the kart racer (src/, test/ race + item sims)
+│   ├── tiki-kart/        # Three.js source for the kart racer (src/, test/ race + item sims)
+│   └── dust-strike/      # Three.js source for the 5v5 shooter (src/, test/ bot-match + player sims)
 └── public/               # everything that gets deployed
     ├── index.html        # landing page
     ├── 404.html          # "Game over" not-found page
