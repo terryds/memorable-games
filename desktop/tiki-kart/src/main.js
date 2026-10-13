@@ -492,7 +492,7 @@ addEventListener('resize', resize);
 
 // test hook: step the race deterministically with a fixed input
 window.__game = {
-  G, settings, startRace, enterMenu, camera,
+  G, settings, startRace, enterMenu, camera, audio,
   get track() { return track; },
   advance(sec, input = {}) {
     if (G.state === 'countdown') { G.state = 'race'; $('count').textContent = ''; }
