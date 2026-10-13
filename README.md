@@ -4,7 +4,7 @@
 
 The classics you remember — rebuilt from scratch to play instantly in the browser: six mobile
 hits plus 3D racers and a tactical shooter for the big screen.
-Live at **https://games.terrydjony.com**
+Live at **https://games.terrydjony.com** · Source: **https://github.com/terryds/memorable-games**
 
 | # | Game | Path | Controls |
 |---|------|------|----------|
