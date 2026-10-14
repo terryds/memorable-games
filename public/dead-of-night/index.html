@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dead of Night — Co-op Zombie Survival</title>
+<link rel="icon" href="icon.svg" />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#050607" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="loading">
+  <div class="logo">DEAD <span>OF</span> NIGHT</div>
+  <div class="bar"><i id="loadbar"></i></div>
+  <div id="loadtext">…</div>
+  <div class="warn">🎧 Headphones recommended. Turn the lights off.</div>
+</div>
+
+<div id="menu" class="hidden">
+  <a class="homeLink" href="../">← All games</a>
+  <div class="menu-left">
+    <div class="logo">DEAD <span>OF</span> NIGHT</div>
+    <div class="tag">Harbor Town · four survivors · one way out</div>
+    <p class="brief">The radio said the docks. Get out of the safe room, cross the town, the park and the warehouse, and call the boat. Stick together. Don't startle the crying woman.</p>
+    <h3>Difficulty</h3>
+    <div class="row" id="diffs">
+      <button class="pill" data-v="easy">Easy</button>
+      <button class="pill" data-v="normal">Normal</button>
+      <button class="pill" data-v="advanced">Advanced</button>
+    </div>
+    <h3>Mouse sensitivity <b id="sensv">1.00</b></h3>
+    <input type="range" id="sens" min="0.2" max="3" step="0.05" />
+    <h3>Volume <b id="volv">80%</b></h3>
+    <input type="range" id="vol" min="0" max="1" step="0.05" />
+    <div class="row" style="margin-top:12px"><button id="optQuality" class="pill small">Graphics: HIGH</button><button id="optInvert" class="pill small">Invert Y: OFF</button></div>
+    <button id="go" class="go">ENTER THE NIGHT <kbd>ENTER</kbd></button>
+  </div>
+  <div class="howto">
+    <h3>How to survive</h3>
+    <ul>
+      <li><kbd>W A S D</kbd> move · <kbd>Mouse</kbd> look · <kbd>Space</kbd> jump · <kbd>C</kbd>/<kbd>Ctrl</kbd> crouch · <kbd>Shift</kbd> walk</li>
+      <li><kbd>LMB</kbd> fire · <kbd>RMB</kbd> <b>shove</b> — knocks back anything grabbing you · <kbd>R</kbd> reload</li>
+      <li><kbd>1</kbd> primary · <kbd>2</kbd> pistols · <kbd>3</kbd> pipe bomb / molotov · <kbd>4</kbd> first aid (hold LMB) · <kbd>5</kbd> pills</li>
+      <li><kbd>E</kbd> pick up · open doors · <b>hold</b> to revive a downed teammate · use the radio</li>
+      <li><kbd>F</kbd> flashlight · <kbd>Tab</kbd> team status · <kbd>Esc</kbd> pause</li>
+    </ul>
+    <h3>Know the infected</h3>
+    <ul class="inf">
+      <li><b>Hunter</b> — screeches, then pounces and pins you. Teammates shove or shoot it off.</li>
+      <li><b>Boomer</b> — bloated. Its bile draws the horde. Don't pop it up close.</li>
+      <li><b>Tank</b> — you'll hear it before you see it. Run, burn it, unload everything.</li>
+      <li><b>Witch</b> — you'll hear her crying. Lights off, keep your distance, don't shoot.</li>
+    </ul>
+  </div>
+</div>
+
+<div id="hud" class="hidden">
+  <div id="team"></div>
+  <div id="ammo"><b id="mag">30</b><span id="res">∞</span><small id="wname">Dual Pistols</small></div>
+  <div id="slots"></div>
+  <div id="cross"><i></i><i></i><i></i><i></i></div>
+  <div id="prompt"></div>
+  <div id="bar"><i id="barfill"></i><span id="bartext"></span></div>
+  <div id="sub"></div>
+  <div id="objective"></div>
+  <div id="finale"></div>
+  <div id="hitmark"></div>
+</div>
+<div id="clickToPlay" class="hidden">Click to resume</div>
+
+<div id="pause" class="overlay hidden">
+  <h2>PAUSED</h2>
+  <button data-act="resume">Resume</button>
+  <button data-act="restart">Restart</button>
+  <button data-act="menu">Quit to Menu</button>
+</div>
+<div id="over" class="overlay hidden">
+  <h2 id="overtitle">YOU DIED</h2>
+  <p id="overreason"></p>
+  <div id="overstats"></div>
+  <div class="row">
+    <button data-act="restart">Try Again <kbd>ENTER</kbd></button>
+    <button data-act="menu">Menu <kbd>ESC</kbd></button>
+  </div>
+</div>
+<script type="module" src="dist/main.js"></script>
+</body>
+</html>

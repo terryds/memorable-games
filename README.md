@@ -22,6 +22,7 @@ Live at **https://games.terrydjony.com** · Source: **https://github.com/terryds
 | 7 | 🏎️ Carbon Nights | `/carbon-nights/` | Game controller recommended (RT gas, LT brake, A drift, B nitro). Keyboard: W/S, A/D, Space = handbrake, Shift = nitro, Q = Speedbreaker, C = camera, R = reset |
 | 8 | 🏝️ Tiki Kart Rally | `/tiki-kart/` | Controller recommended (A/RT gas, RB hop + powerslide, LB turbo, B item). Keyboard: W/S, A/D, Space = hop/slide, Shift = turbo, E = item, R = rescue |
 | 9 | 💣 Dust Strike | `/dust-strike/` | Mouse & keyboard: WASD, mouse aim, LMB fire, RMB scope/stab/lob, Space jump, C (or Ctrl in fullscreen) crouch, Shift walk, R reload, 1–5/Q/wheel weapons, B buy, E plant/defuse/pick up, G drop, Tab scores |
+| 10 | 🧟 Dead of Night | `/dead-of-night/` | Mouse & keyboard: WASD, mouse aim, LMB fire, RMB shove, R reload, 1–5 slots, E pick up / open / hold to revive, F flashlight, C crouch, Space jump |
 
 Carbon Nights is a Three.js street racer inspired by a 2006 night-racing classic: a wet neon
 downtown, a canyon road with a view over the city, and a waterfront run past a lit suspension
@@ -39,6 +40,14 @@ headshots, planting/defusing, a radar and a first-to-5/8/12 match. The simulatio
 `bots.js`, `map.js`) has no DOM or three.js dependency, so `bun test/sim.js [easy|normal|hard]` plays
 full bot-vs-bot matches headlessly and `bun test/player.js` checks buying, planting, defusing and recoil.
 
+Dead of Night is a 4-player co-op zombie survival inspired by a 2008 classic: you and three AI
+survivors fight from a safe room through a dead harbor town (main street, park, gas station,
+warehouse) to a radio at the docks, then hold out until the boat arrives. An AI Director paces
+mobs, hordes and special infected (Hunter, Boomer, Tank, Witch); the eerie soundscape is entirely
+synthesized (drones, wind, distant screams, a broken music box, 3D groans, the Witch's sobbing).
+The simulation (`desktop/dead-of-night/src/sim.js`, `map.js`, `bots.js`) is DOM-free:
+`bun test/sim.js [easy|normal|advanced] [seed]` plays a full bot run.
+
 ## How it's built
 
 - **Zero dependencies, zero build step.** Every game is one self-contained `index.html`
@@ -49,7 +58,7 @@ full bot-vs-bot matches headlessly and `bun test/player.js` checks buying, plant
 - **Mobile-first**: touch controls, safe-area insets, no zoom/scroll bounce, and each game
   can be installed to the home screen (opens full-screen).
 - **High scores** live in `localStorage` (per-game key prefixes: `twocars.`, `dj.`, `fn.`,
-  `flappy.`, `gh.`, `g2048.`, `cn-`, `tiki`, `dust`), so the landing page can show your personal bests.
+  `flappy.`, `gh.`, `g2048.`, `cn-`, `tiki`, `dust`, `dead`), so the landing page can show your personal bests.
 - **The desktop games are the one exception to "no build step"**: they use Three.js, so their
   source lives in `desktop/<game>/` and is bundled with Bun into `public/<game>/dist/main.js`.
   The bundles are committed, so deploying still needs no build.
@@ -60,7 +69,8 @@ full bot-vs-bot matches headlessly and `bun test/player.js` checks buying, plant
 ├── desktop/
 │   ├── carbon-nights/    # Three.js source for the street racer (src/, test/ physics sims)
 │   ├── tiki-kart/        # Three.js source for the kart racer (src/, test/ race + item sims)
-│   └── dust-strike/      # Three.js source for the 5v5 shooter (src/, test/ bot-match + player sims)
+│   ├── dust-strike/      # Three.js source for the 5v5 shooter (src/, test/ bot-match + player sims)
+│   └── dead-of-night/    # Three.js source for the co-op zombie survival (src/, test/ full-run sim)
 └── public/               # everything that gets deployed
     ├── index.html        # landing page
     ├── 404.html          # "Game over" not-found page
@@ -75,7 +85,9 @@ full bot-vs-bot matches headlessly and `bun test/player.js` checks buying, plant
     ├── guitar-hero/
     ├── 2048/
     ├── carbon-nights/    # index.html, style.css, manifest, icon + dist/main.js (built bundle)
-    └── tiki-kart/        # same layout
+    ├── tiki-kart/        # same layout
+    ├── dust-strike/
+    └── dead-of-night/
 ```
 
 All paths inside `public/` are relative, so the site works from any host or sub-path.

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Memorable Games — a tribute to the games we grew up with</title>
-<meta name="description" content="Fruit Ninja, Flappy Bird, Doodle Jump, Two Cars, Guitar Hero and 2048 — the mobile games you remember, rebuilt for the browser — plus 3D desktop games: the Carbon Nights and Tiki Kart Rally racers and the Dust Strike shooter. Free, no install, no ads.">
+<meta name="description" content="Fruit Ninja, Flappy Bird, Doodle Jump, Two Cars, Guitar Hero and 2048 — the mobile games you remember, rebuilt for the browser — plus 3D desktop games: the Carbon Nights and Tiki Kart Rally racers the Dust Strike shooter and the Dead of Night co-op zombie survival. Free, no install, no ads.">
 <meta name="theme-color" content="#120a24">
 <link rel="icon" href="assets/icon.svg">
 <link rel="apple-touch-icon" href="assets/icon.svg">
@@ -12,13 +12,13 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://games.terrydjony.com/">
 <meta property="og:title" content="Memorable Games — a tribute to the games we grew up with">
-<meta property="og:description" content="The mobile classics you remember, plus 3D racers and a tactical shooter for desktop — rebuilt for your browser. Free, open source, no ads.">
+<meta property="og:description" content="The mobile classics you remember, plus 3D racers, a tactical shooter and co-op zombie survival for desktop — rebuilt for your browser. Free, open source, no ads.">
 <meta property="og:image" content="https://games.terrydjony.com/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Memorable Games — a tribute to the games we grew up with">
-<meta name="twitter:description" content="The classics you remember — rebuilt for your browser, from phone favourites to 3D racers and a 5v5 shooter.">
+<meta name="twitter:description" content="The classics you remember — rebuilt for your browser, from phone favourites to 3D racers, a 5v5 shooter and a zombie apocalypse.">
 <meta name="twitter:image" content="https://games.terrydjony.com/assets/og.png">
 <style>
   :root {
@@ -129,6 +129,9 @@
   .dcard.desert { background: linear-gradient(135deg, #3a2a18, #8a6236 50%, #d9a85b); }
   .dcard.desert::before { background: radial-gradient(60% 80% at 0% 0%, #ffffff22, transparent 60%), radial-gradient(50% 70% at 100% 100%, #f2c14e55, transparent 60%); }
   .dcard.desert h3 { background: linear-gradient(90deg, #fff, #ffe2a8); -webkit-background-clip: text; background-clip: text; }
+  .dcard.night { background: linear-gradient(135deg, #050707, #0f1614 50%, #2a0806); }
+  .dcard.night::before { background: radial-gradient(60% 80% at 0% 0%, #6a9a8a22, transparent 60%), radial-gradient(50% 70% at 100% 100%, #8a141055, transparent 60%); }
+  .dcard.night h3 { background: linear-gradient(90deg, #e6e0d0, #c84a3a); -webkit-background-clip: text; background-clip: text; }
   .dcard:hover { transform: translateY(-4px); box-shadow: 0 18px 40px #0008, 0 0 0 2px #00e5ff55; }
   .monitor { position: relative; padding: 8px 8px 0; border-radius: 16px 16px 6px 6px; background: #05060c; box-shadow: 0 16px 34px #000a, inset 0 0 0 2px #ffffff1c; }
   .monitor img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 9px; background: #000; }
@@ -172,20 +175,20 @@
   <div class="floaters" aria-hidden="true">
     <span style="left:6%;top:22%">🚗</span><span style="left:88%;top:18%;animation-delay:-1s">🍉</span>
     <span style="left:12%;top:68%;animation-delay:-2s">🐦</span><span style="left:84%;top:62%;animation-delay:-3s">🎸</span>
-    <span style="left:50%;top:6%;animation-delay:-1.5s;font-size:26px">⭐</span><span style="left:72%;top:84%;animation-delay:-2.5s;font-size:28px">🔢</span><span style="left:26%;top:86%;animation-delay:-3.5s;font-size:30px">🏎️</span><span style="left:92%;top:40%;animation-delay:-4s;font-size:30px">🏝️</span><span style="left:4%;top:44%;animation-delay:-4.5s;font-size:28px">💣</span>
+    <span style="left:50%;top:6%;animation-delay:-1.5s;font-size:26px">⭐</span><span style="left:72%;top:84%;animation-delay:-2.5s;font-size:28px">🔢</span><span style="left:26%;top:86%;animation-delay:-3.5s;font-size:30px">🏎️</span><span style="left:92%;top:40%;animation-delay:-4s;font-size:30px">🏝️</span><span style="left:4%;top:44%;animation-delay:-4.5s;font-size:28px">💣</span><span style="left:62%;top:90%;animation-delay:-5s;font-size:28px">🧟</span>
   </div>
   <div class="wrap hero">
-    <span class="badge">🕹️ 6 mobile games + 3 desktop games · free · open source</span>
+    <span class="badge">🕹️ 6 mobile games + 4 desktop games · free · open source</span>
     <h1>Memorable<br><span class="grad">Games</span></h1>
     <p class="tribute">A tribute to the games we grew up with.</p>
-    <p class="tagline">The classics you remember from the good old days — rebuilt from scratch to play instantly in your browser, from one-thumb phone hits to 3D racers and a tactical shooter for the big screen. No app store. No ads. Just play.</p>
+    <p class="tagline">The classics you remember from the good old days — rebuilt from scratch to play instantly in your browser, from one-thumb phone hits to 3D racers, a tactical shooter and a co-op zombie survival for the big screen. No app store. No ads. Just play.</p>
     <div class="cta">
       <a class="btn" href="#games">▶ Pick a game</a>
       <a class="btn ghost" href="#desktop">🖥️ Desktop games</a>
       <a class="btn ghost" href="#install">📲 Add to home screen</a>
     </div>
     <a class="gh" href="https://github.com/terryds/memorable-games" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg> Open source on GitHub — star it ⭐</a>
-    <div class="stats"><div><b>9</b>games</div><div><b>0</b>downloads</div><div><b>∞</b>retries</div></div>
+    <div class="stats"><div><b>10</b>games</div><div><b>0</b>downloads</div><div><b>∞</b>retries</div></div>
   </div>
 </header>
 
@@ -245,6 +248,19 @@
           <div class="note phone-only">📵 Needs a computer with a mouse and keyboard.</div>
         </div>
       </a>
+      <a class="dcard night" href="dead-of-night/">
+        <span class="best" id="dnBest"></span>
+        <div class="monitor"><img src="assets/shots/dead-of-night.jpg" alt="Dead of Night screenshot" loading="lazy" width="1280" height="720"></div>
+        <div class="info">
+          <span class="num">NO. 10 · DESKTOP</span>
+          <h3>Dead of Night</h3>
+          <span class="meta">4-player co-op zombie survival · inspired by a 2008 classic</span>
+          <p>Four survivors, one dead harbor town, and the boat at the docks. Fight hordes through fog and flickering streetlights with three AI teammates, revive each other, and survive Hunters, Boomers, the Tank — and the Witch you can hear crying in the park.</p>
+          <div class="how"><span class="rec">🎧 Headphones on, lights off</span><span>🖱️ Mouse &amp; keyboard</span><span>🧟 Hordes &amp; specials</span><span>🤝 3 AI teammates</span></div>
+          <span class="play">▶ Play on desktop</span>
+          <div class="note phone-only">📵 Needs a computer with a mouse and keyboard.</div>
+        </div>
+      </a>
     </div>
   </section>
 
@@ -254,7 +270,7 @@
       <div class="install">
         <div class="step"><div class="ico">📱</div><h4>iPhone / iPad (Safari)</h4><ol><li>Open a game</li><li>Tap the <b>Share</b> button</li><li>Choose <b>Add to Home Screen</b></li></ol></div>
         <div class="step"><div class="ico">🤖</div><h4>Android (Chrome)</h4><ol><li>Open a game</li><li>Tap the <b>⋮</b> menu</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b></li></ol></div>
-        <div class="step"><div class="ico">💻</div><h4>Desktop</h4><ol><li>Just click and play</li><li>Keyboard controls are listed in each game</li><li>Turn the sound on for Guitar Hero 🎸</li><li>Plug in a controller for the racers 🏎️</li><li>Grab a mouse for Dust Strike 🔫</li></ol></div>
+        <div class="step"><div class="ico">💻</div><h4>Desktop</h4><ol><li>Just click and play</li><li>Keyboard controls are listed in each game</li><li>Turn the sound on for Guitar Hero 🎸</li><li>Plug in a controller for the racers 🏎️</li><li>Grab a mouse for Dust Strike 🔫</li><li>Headphones on for Dead of Night 🧟</li></ol></div>
       </div>
       <div class="why">
         <div>⚡<b>Instant</b><span>Every game is a single tiny page. It loads in a blink, even on slow data.</span></div>
@@ -314,6 +330,8 @@
   const dsWins = +localStorage.getItem("dust.wins") || 0;
   if (dsWins > 0) { const el = document.getElementById("dsBest"); el.textContent = "🏆 Matches won: " + dsWins; el.style.display = "block"; el.style.zIndex = 2; }
   if (tkWins > 0) { const el = document.getElementById("tkBest"); el.textContent = "🏆 Wins: " + tkWins; el.style.display = "block"; el.style.zIndex = 2; }
+  const dnWins = +localStorage.getItem("dead.wins") || 0;
+  if (dnWins > 0) { const el = document.getElementById("dnBest"); el.textContent = "🚤 Escapes: " + dnWins; el.style.display = "block"; el.style.zIndex = 2; }
   if (cnBest > 0) { const el = document.getElementById("cnBest"); el.textContent = "🏆 Best drift: " + cnBest.toLocaleString(); el.style.display = "block"; el.style.zIndex = 2; }
   GAMES.forEach((g, i) => {
     const b = g.best();

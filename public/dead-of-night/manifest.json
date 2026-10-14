@@ -1,0 +1,1 @@
+{ "name": "Dead of Night", "short_name": "Dead of Night", "start_url": "./", "display": "fullscreen", "orientation": "landscape", "background_color": "#050607", "theme_color": "#050607", "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }], "scope": "./" }
